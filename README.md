@@ -62,7 +62,7 @@ npm install
 npm run dev
 ```
 
-Odpri http://localhost:3010. Za produkcijski lokalni preizkus: `npm run build`, nato `npm start`.
+Odpri http://127.0.0.1:3010. Za produkcijski lokalni preizkus: `npm run build`, nato `npm start`.
 
 Repozitorij vključuje `data/itineraries.csv`, zato pregled poti deluje tudi po sveži namestitvi. Gre za posnetek podatkov, ne za sproti posodobljen itinerar. Za uporabo druge datoteke nastavi `AHOIER_ITINERARY_FILE` na njeno pot in znova zaženi strežnik.
 

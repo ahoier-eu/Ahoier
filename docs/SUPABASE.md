@@ -4,7 +4,7 @@ Ta nastavitev poveže **novo skupno skupnost** s Supabase Auth in Postgres. Loka
 
 ## 1. Ustvari projekt in nastavi prijavo
 
-V [Supabase Dashboardu](https://supabase.com/dashboard/projects) ustvari nov projekt. V **Authentication → Providers → Email** omogoči prijavo s povezavo po e-pošti (Magic Link). V **Authentication → URL Configuration** nastavi `Site URL` na `http://localhost:3010/community` za lokalni razvoj in dodaj **točno** `http://localhost:3010/community` med `Redirect URLs`. Ahoierjeva trenutna odjemalska prijava uporablja `emailRedirectTo` na `/community` in tam obdela implicitni Auth povratni tok; poti `/auth/callback` ta različica ne uporablja. Ob produkcijski objavi uporabi točen HTTPS naslov produkcijske skupnosti v obeh nastavitvah.
+V [Supabase Dashboardu](https://supabase.com/dashboard/projects) ustvari nov projekt. V **Authentication → Providers → Email** omogoči prijavo s povezavo po e-pošti (Magic Link). V **Authentication → URL Configuration** dodaj `http://127.0.0.1:3010/community` med `Redirect URLs`; če stran odpiraš prek `localhost`, dodaj tudi `http://localhost:3010/community`. Za projekt, namenjen samo lokalnemu Ahoierju, lahko `Site URL` nastaviš na `http://127.0.0.1:3010/community`; pri deljenem projektu ga ne spreminjaj brez pregleda drugih aplikacij. Ahoierjeva odjemalska prijava uporabi dejanski naslov odprte strani za `emailRedirectTo` in tam obdela implicitni Auth povratni tok; poti `/auth/callback` ta različica ne uporablja. Ob produkcijski objavi dodaj točen HTTPS naslov produkcijske skupnosti med dovoljene preusmeritve.
 
 V **Project Settings → API / Connect** kopiraj `Project URL` in **publishable** key v lokalni `.env.local`:
 
@@ -13,7 +13,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_YOUR_KEY
 ```
 
-`.env.local` je izključen iz Gita. V Ahoier ne dodajaj `secret`, `service_role` ali database gesla; aplikacija uporablja uporabnikov Auth žeton in pravila RLS. Publishable key ni skrivnost, vendar sam po sebi ne daje dostopa do vrstic. Po spremembi `NEXT_PUBLIC_*` ponovno zaženi razvojni strežnik; Next te vrednosti v produkciji vgradi med gradnjo, zato tam ponovno zgradi in objavi aplikacijo. Prijavni tok preveri na `http://localhost:3010/community` po `npm run dev`.
+`.env.local` je izključen iz Gita. V Ahoier ne dodajaj `secret`, `service_role` ali database gesla; aplikacija uporablja uporabnikov Auth žeton in pravila RLS. Publishable key ni skrivnost, vendar sam po sebi ne daje dostopa do vrstic. Po spremembi `NEXT_PUBLIC_*` ponovno zaženi razvojni strežnik; Next te vrednosti v produkciji vgradi med gradnjo, zato tam ponovno zgradi in objavi aplikacijo. Prijavni tok preveri na `http://127.0.0.1:3010/community` po `npm run dev`.
 
 ## 2. Ustvari shemo
 
