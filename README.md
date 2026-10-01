@@ -1,8 +1,8 @@
 # Ahoier
 
-Samostojen začetni projekt za goste AIDA. Poudarek je na druženju na ladji, srečanjih in izmenjavi informacij med gosti. Glavna skupnost je **lokalni interaktivni predogled**; ločeni `/pilot` omogoča omejen skupni preizkus za povabljene goste.
+Samostojen začetni projekt za goste AIDA. Poudarek je na druženju na ladji, srečanjih in izmenjavi informacij med gosti. Začetna stran je **lokalni interaktivni predogled**; po konfiguraciji Supabase se od tam odpre ločena skupna skupnost za povabljene člane potovanja. Ločeni `/pilot` še vedno omogoča preizkus srečanj v lokalni strežniški bazi.
 
-## Družabna različica
+## Lokalni družabni predogled (brez Supabase)
 
 - `/`: začetna stran »An Bord«, srečanja, skupnost, skupinski pogovori in lokalni profil.
 - `/reise`: izbor ladje in datumov, itinerar iz vključenega podatkovnega posnetka, pristanišča in priljubljeni postanki.
@@ -20,6 +20,12 @@ Samostojen začetni projekt za goste AIDA. Poudarek je na druženju na ladji, sr
 - `/pilot`: ločen pilotni prostor za povabljene goste ene izbrane plovbe. Na istem strežniku vidijo ista srečanja; gost lahko predlaga srečanje, potrdi 1–10 mest, se odjavi, po srečanju sam označi udeležbo ali odsotnost oziroma vsebino prijavi upravljavcu pilota. Gostitelj lahko srečanje odpove. Pilot ne vsebuje skupnega klepeta, javnega toka objav ali primerov izmišljenih gostov.
 
 Podatki **lokalne predogledne skupnosti** se hranijo pod `ahoier:community:v1` v localStorage. V njej ni prijave, pošiljanja sporočil drugim ljudem, spletne objave, potisnih obvestil ali dejanske moderacije. Skrivanje vsebine ni prijava moderatorju. Uporaba v več zavihkih istega brskalnika se usklajuje; drugi brskalniki in naprave nimajo skupnih podatkov. Pilotni prostor `/pilot` uporablja ločeno strežniško bazo in je opisan spodaj.
+
+## Skupnost s Supabase
+
+Ko nastaviš `NEXT_PUBLIC_SUPABASE_URL` in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ter izvedeš SQL migracijo, se odpre `/community`: prijava z e-poštnim povezovalnim sporočilom, prikazno ime, vstop v potovanje s povabilom, objave, odgovori in prijava neprimerne vsebine. Začetna stran ostane predogled z jasno povezavo na skupno skupnost. Objave so vidne samo prijavljenim članom iste povabljene skupine. Koda ne potrjuje rezervacije ali identitete. Srečanja ostanejo v ločenem `/pilot`, Ahoi Dates pa lokalni zasebni predogled. Lokalnih profilov in objav ne prenašamo samodejno v Supabase.
+
+Navodila za nastavitev projekta, varnostnih pravil in povabil so v [docs/SUPABASE.md](docs/SUPABASE.md). V `.env.local` sodita samo **Project URL** in **publishable key**; skrivnega ključa ne dodajaj v aplikacijo ali Git.
 
 ## Povabljeni pilot
 
@@ -75,13 +81,13 @@ npm run build
 - Časi prihodov in odhodov so prikazani tako kot v viru. Zavezujoči čas vrnitve na ladjo mora gost preveriti na krovu.
 - Risba poti je shematska; povezave na OpenStreetMap odprejo lokacijo pristanišča, ne potrjenega priveza.
 - Fotografije ladij so predogledi z Wikimedia Commons. Natančni viri, avtorji, licence in opomba o pomanjšanju so v [pripisih fotografij](docs/SHIP_PHOTO_CREDITS.md); povezave za trenutno ladjo so tudi v nogi strani. Te licence veljajo za posamezne fotografije, ne za celotno aplikacijo.
-- Izbor potovanja in priljubljena pristanišča se shranijo samo v brskalniku. Ni prijave, plačil, povezave s Supabase ali prenosa osebnih podatkov posadke.
+- Izbor potovanja in priljubljena pristanišča se shranijo samo v brskalniku. Supabase skupnost ima ločen račun in podatke; plačil ali prenosa osebnih podatkov posadke ni.
 - Tipografija uporablja lokalno shranjeni Bricolage Grotesque (naslovi) in Plus Jakarta Sans (besedilo) z nadomestno sistemsko pisavo. Izvor: repozitorij google/fonts; licenci OFL sta priloženi v public/fonts. Zunanji zemljevid se odpre šele s klikom povezave.
 - Projekt ni uradna aplikacija AIDA. Iskalnikom je nastavljen `noindex`, ker gre za začetno različico.
 
 ## Naslednja faza: prava skupnost
 
-Pred javno uporabo vzpostavi produkcijsko gostovanje in bazo za Ahoier, preverjen postopek osveževanja itinerarjev, pravne vsebine ter pravice za fotografije in znamke. Pilot ima strežniško avtorizacijo z vabili, transakcijske prijave in lokalni pregled prijav, vendar nima preverjene identitete ali rezervacije, samopostrežne obnove računa, stalne moderacijske ekipe ali infrastrukture za več strežnikov. Za produkcijsko skupnost potrebujemo stabilne identifikatorje križarjenj, preverjanje članstva, zanesljivo moderiranje, zasebnost in operativno podporo.
+Pred javno uporabo preveri produkcijsko gostovanje in konfiguracijo Supabase, postopek osveževanja itinerarjev, pravne vsebine ter pravice za fotografije in znamke. Supabase povabilo omeji dostop do potovalne skupine, ne preveri pa rezervacije ali identitete; odziv na prijave vsebin je še vedno treba organizirati. Ločeni pilot srečanj nima samopostrežne obnove računa, stalne moderacijske ekipe ali infrastrukture za več strežnikov. Za širšo produkcijsko skupnost potrebujemo preverjanje članstva, zanesljivo moderiranje, zasebnost in operativno podporo.
 
 Pred javno skupnostjo potrebujemo tudi natančnejši ladijski čas za celotno pot, pravila za pretekle objave ter vir uradnega programa na ladji. Ura srečanja je vnos gostitelja, ne potrjen uradni čas. Zasebni stiki, javni imenik gostov, otroški profili in rezervacije še niso vključeni. Družinska prijava hrani samo število mest pri odraslem gostu, ne imen ali starosti otrok; v pilotu zasedbo preverja strežnik, v lokalnem predogledu pa ostane v brskalniku.
 

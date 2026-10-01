@@ -11,5 +11,6 @@ export default function Home() {
   const first = allStops().find(s => s.ship === ship && s.date >= today) ?? allStops().find(s => s.ship === ship);
   const from = first?.date ?? today;
   const initialJourney = { ship, from, to: addDays(from, 7) };
-  return <CommunityApp fleet={fleet} initialJourney={initialJourney} />;
+  const liveEnabled = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+  return <CommunityApp fleet={fleet} initialJourney={initialJourney} liveEnabled={liveEnabled} />;
 }
