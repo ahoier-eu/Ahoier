@@ -5,7 +5,7 @@ Samostojen začetni projekt za goste AIDA. Poudarek je na druženju na ladji, sr
 ## Družabna različica
 
 - `/`: začetna stran »An Bord«, srečanja, skupnost, skupinski pogovori in lokalni profil.
-- `/reise`: izbor ladje in datumov; itinerar, pristanišča in priljubljeni postanki se prikažejo, če je lokalno nameščen podatkovni CSV.
+- `/reise`: izbor ladje in datumov, itinerar iz vključenega podatkovnega posnetka, pristanišča in priljubljeni postanki.
 - Profil: prikazno ime, opis, interesi in neobvezna zasebna izbira, ali gost potuje sam, v paru, z družino ali prijatelji. Za ustvarjanje objav in prijavo na srečanje najprej shrani ime.
 - Srečanja: ustvarjanje, prijava/odjava, omejitev mest, iskanje, prikaz lastnih srečanj in odpoved organizatorja. Gost lahko prijavi 1–10 oseb skupaj, pozneje spremeni število mest; zasedenost šteje ljudi, ne profilov. Organizator lahko svoje srečanje označi kot primerno za družine, gostje pa taka srečanja filtrirajo.
 - Skupnost: kategorije, nove objave, odgovori, oznaka »koristno« in lokalno skrivanje vsebine.
@@ -58,7 +58,7 @@ npm run dev
 
 Odpri http://localhost:3010. Za produkcijski lokalni preizkus: `npm run build`, nato `npm start`.
 
-Javni repozitorij ne vsebuje datoteke z itinerarji. Brez nje delujeta družabni predogled in povabljeni pilot, pregled poti pa pokaže prazno stanje. Če imaš pravico do uporabe podatkov, dodaj svoj CSV lokalno kot `data/itineraries.csv` ali nastavi `AHOIER_ITINERARY_FILE` na zasebno pot do datoteke, nato znova zaženi strežnik. Podatkovne datoteke ne dodajaj v javni Git.
+Repozitorij vključuje `data/itineraries.csv`, zato pregled poti deluje tudi po sveži namestitvi. Gre za posnetek podatkov, ne za sproti posodobljen itinerar. Za uporabo druge datoteke nastavi `AHOIER_ITINERARY_FILE` na njeno pot in znova zaženi strežnik.
 
 ## Preverjanje
 
@@ -71,7 +71,7 @@ npm run build
 
 ## Podatki in omejitve
 
-- `data/itineraries.csv` je neobvezna lokalna datoteka in je izključena iz javnega repozitorija, ker izvorne pravice za prej uvoženi posnetek iz Locker9 niso potrjene. Tudi ob nameščenem CSV ni sprotnega preverjanja sprememb plovbe. Izbor ladje in datumov sestavi pregled zapisov, ne potrjene rezervacije konkretnega križarjenja.
+- `data/itineraries.csv` je vključen posnetek prej uvoženih itinerarjev iz Locker9. Podatki niso uradni ali sproti posodobljeni; izbor ladje in datumov sestavi pregled zapisov, ne potrjene rezervacije konkretnega križarjenja.
 - Časi prihodov in odhodov so prikazani tako kot v viru. Zavezujoči čas vrnitve na ladjo mora gost preveriti na krovu.
 - Risba poti je shematska; povezave na OpenStreetMap odprejo lokacijo pristanišča, ne potrjenega priveza.
 - Fotografije ladij so predogledi z Wikimedia Commons. Natančni viri, avtorji, licence in opomba o pomanjšanju so v [pripisih fotografij](docs/SHIP_PHOTO_CREDITS.md); povezave za trenutno ladjo so tudi v nogi strani. Te licence veljajo za posamezne fotografije, ne za celotno aplikacijo.

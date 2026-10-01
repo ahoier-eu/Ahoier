@@ -10,4 +10,3 @@ next-env.d.ts
 *.sqlite*
 *.db
 *.db-*
-data/itineraries.csv
