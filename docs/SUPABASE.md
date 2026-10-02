@@ -17,9 +17,9 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_YOUR_KEY
 
 ## 2. Ustvari shemo
 
-V **SQL Editorju** z lastniško vlogo projekta zaženi migraciji **v tem vrstnem redu**, vsako samo enkrat: najprej zgodovinsko osnovno shemo [`20261001000000_ahoier_shared_community.sql`](../supabase/migrations/20261001000000_ahoier_shared_community.sql), nato spremembo za odprte plovbe [`20261002000000_ahoier_open_voyages.sql`](../supabase/migrations/20261002000000_ahoier_open_voyages.sql). Lahko ju uporabiš tudi kot zaporedni migraciji Supabase CLI. Če je prva migracija že nameščena, izvedi samo drugo. V projektu naj bo prek Data API izpostavljena samo predvidena javna shema; **`ahoier_private` nikoli ne dodaj med Exposed schemas**. Prva migracija je zgodovinski zapis zasnove s kodami; druga odstrani uporabo kode za vstop v sedanjo skupnost. Pred objavo odjemalca brez kode mora biti druga migracija že izvedena, sicer pridružitev ne bo delovala.
+V **SQL Editorju** z lastniško vlogo projekta zaženi migracije **v tem vrstnem redu**, vsako samo enkrat: osnovno shemo [`20261001000000_ahoier_shared_community.sql`](../supabase/migrations/20261001000000_ahoier_shared_community.sql), odprte plovbe [`20261002000000_ahoier_open_voyages.sql`](../supabase/migrations/20261002000000_ahoier_open_voyages.sql) in družabno steno [`20261003000000_ahoier_social_wall.sql`](../supabase/migrations/20261003000000_ahoier_social_wall.sql). Če sta prvi dve že nameščeni, izvedi samo tretjo. V projektu naj bo prek Data API izpostavljena samo predvidena javna shema; **`ahoier_private` nikoli ne dodaj med Exposed schemas**. Tretjo migracijo in zasebno shrambo izvedi pred objavo novega `/community` odjemalca.
 
-Tabele: `ahoier_profiles` (prikazno ime), `ahoier_voyages` (plovbe), `ahoier_memberships` (članstva), `ahoier_posts` (objave), `ahoier_replies` (odgovori), `ahoier_reports` (prijave vsebine). Prijavljen uporabnik lahko vidi seznam ustvarjenih plovb in po shranitvi profila doda svoje članstvo. Ne more ustvarjati plovb ali članstva za drugo osebo. Profilno ime vidi lastnik; drugi člani skupne plovbe ga vidijo šele, ko ima ta uporabnik tam vidno objavo ali odgovor. Imenika vseh članov ni. Objave in odgovori so vidni le članom iste plovbe; skrita vsebina ni vidna. Avtor lahko doda ali izbriše svojo vsebino. Gosti lahko prijavo **samo vložijo**: ne morejo brati seznama prijav, ga spreminjati ali sami nastaviti `hidden_at`. Prijavijo lahko objavo ali odgovor drugega avtorja, ne svoje vsebine. Trigger ob vložitvi prijave shrani takratno vsebino, avtorjev ID in ID plovbe v stolpce, ki jih gostje ne morejo brati ali pisati.
+Tretja migracija ohrani obstoječe objave in doda fotografije, odzive, Stories, prijateljstva, zasebna sporočila, blokiranje ter moderatorsko vrsto. Obstoječi uporabniki ob naslednjem obisku sami potrdijo polnoletnost; njihovi podatki ostanejo. Imenik pokaže prikazno ime in neobvezno fotografijo vseh članov izbrane plovbe. Ker se ji lahko pridruži vsak prijavljen odrasel uporabnik, to ni seznam potrjenih potnikov. E-poštni naslov se v imeniku ne prikazuje. Zasebni pogovor je mogoč šele po obojestranski potrditvi prijateljstva.
 
 ## 3. Ustvari plovbe
 
@@ -45,7 +45,9 @@ order by v.starts_on desc, v.ship;
 
 Ker se lahko vsak prijavljen uporabnik pridruži katerikoli plovbi, odstranitev same vrstice iz `ahoier_memberships` ni trajna blokada: uporabnik se lahko znova pridruži. Za takšno omejitev je potreben ločen postopek blokiranja oziroma upravljanje Auth računa. Za sedanjo skupnost ne ustvarjaj ali razdeljuj kod; kode v ločenem pilotu `/pilot` so namenjene samo pilotnemu dostopu.
 
-## 4. Ročna moderacija
+## 4. Ročna moderacija osnovne sheme
+
+Spodnji SQL postopek opisuje starejšo besedilno skupnost. Po tretji migraciji moderator uporablja `/community/moderation`; pravila in nastavitev so v razdelku 7. SQL pregled ostane možen za lastnika projekta.
 
 Gostu je uspešna prijava shranjena v `ahoier_reports`; **pregledovanje in odziv potekata ročno v SQL Editorju** z upravljavsko vlogo. Naslednja poizvedba pokaže prijave, izvirni posnetek prijavljenega besedila in še obstoječo vsebino. Če je avtor vsebino izbrisal, `current_body` postane `NULL`, posnetek pa ostane za pregled.
 
@@ -166,6 +168,28 @@ Pri SQL Editorju pazljivo nastavi **oba**: vlogo in JWT `sub`. Brez `set local r
 3. Ko poznaš končno HTTPS domeno, v **Supabase → Authentication → URL Configuration** nastavi `Site URL` na njen izvor, na primer `https://ahoier.example`, in med **Redirect URLs** dodaj točen naslov `https://ahoier.example/community`. Če pozneje uporabiš lastno domeno, dodaj tudi njen `/community` in posodobi `Site URL`. Lokalna naslova iz razdelka 1 lahko ostaneta dovoljena. Ahoier prijavni e-poštni povezavi sam poda izvor strani in pot `/community`; `/auth/callback` ni potreben.
 4. Predogledne Vercel objave dobijo drugačne naslove. Če v njih preverjaš prijavo, omogoči spremenljivki tudi za **Preview** ter v Supabase dovoli njihove točne naslove `/community` ali [ustrezen vzorec za Vercel](https://supabase.com/docs/guides/auth/redirect-urls#vercel-preview-urls). Predogled, ki kaže na isti Supabase projekt, uporablja tudi iste resnične uporabnike in objave; za izoliran preizkus uporabi ločen Supabase projekt.
 
-Pred javno uporabo preveri, da sta izvedeni obe migraciji, da je ustvarjena vsaj ena plovba, da e-poštna povezava vrne na **dejansko produkcijsko domeno** in da testni uporabnik lahko shrani ime, se pridruži plovbi, objavi vsebino ter odda prijavo. Uredi tudi dejansko spremljanje in obravnavo prijav iz 4. razdelka. Poti `/demo` in `/dates` sta še vedno lokalna predogleda v brskalniku. **`/pilot` je na Vercelu izklopljen**: uporablja lokalno datoteko SQLite, [Vercelove funkcije pa nimajo trajnega skupnega datotečnega sistema](https://vercel.com/kb/guide/is-sqlite-supported-in-vercel). Pri lokalnem `npm run dev` pilot ostane na voljo. Za produkcijski pilot je potreben strežnik s trajno shrambo ali druga podatkovna rešitev.
+Pred javno uporabo preveri vse tri migracije, vsaj eno plovbo, moderatorski račun in čiščenje medijev. E-poštna povezava se mora vrniti na **dejansko produkcijsko domeno**. Z dvema resničnima testnima računoma preveri imenik, prošnjo za prijateljstvo, zasebno sporočilo, blokado in prijavo vsebine. `/demo` je še vedno lokalen predogled v brskalniku, `/dates` pa ločen lokalni prototip. **`/pilot` je na Vercelu izklopljen**: uporablja lokalno datoteko SQLite, [Vercelove funkcije pa nimajo trajnega skupnega datotečnega sistema](https://vercel.com/kb/guide/is-sqlite-supported-in-vercel).
 
 Uradna referenca: [Supabase RLS in dovoljenja](https://supabase.com/docs/guides/database/postgres/row-level-security), [Auth redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls), [upravljanje ključev](https://supabase.com/docs/guides/getting-started/api-keys).
+
+## 7. Družabna stena: moderacija in čiščenje fotografij
+
+Tretja migracija ustvari zasebni bucket `ahoier-media` ter pravila za fotografije in družabne podatke. Obstoječe besedilne objave ostanejo. Prijavljen odrasel uporabnik vidi imena in profilne fotografije vseh članov svoje plovbe, ker je imenik namenoma odprt; članstvo ni preverjena rezervacija. Prijateljstva in zasebni pogovori ostanejo tudi po plovbi. Starost 18+ je **samo uporabnikova izjava**.
+
+V SQL Editorju kot lastnik dodaj moderatorski račun z njegovim Auth UUID:
+
+```sql
+insert into ahoier_private.ahoier_moderators (user_id)
+values ('UUID_MODERATORJA')
+on conflict do nothing;
+```
+
+Moderator se z običajnim e-poštnim računom prijavi v `/community` in odpre `/community/moderation`. Vidi samo prijavljene objave, Stories in posamezna prijavljena zasebna sporočila, lahko prijavo zavrne, vsebino skrije ali račun omeji. Samo odstranitev članstva ne omeji dostopa, ker se uporabnik lahko znova pridruži. Pred širšo uporabo določi osebo, ki bo prijave dejansko pregledovala.
+
+Potekle Stories in odstranjene fotografije čisti Supabase Edge Function [`ahoier-media-cleanup`](../supabase/functions/ahoier-media-cleanup/index.ts). Funkcija uporablja samo strežniški secret ključ in odstranjuje datoteke prek Storage API. Objave in odgovori izginejo iz pogleda takoj po odstranitvi; odprte prijave zadržijo pripadajoče fotografije za pregled. V projektu z omogočenima `pg_cron` in `pg_net`:
+
+1. Z lastniškim dostopom izvedi `npx supabase functions deploy ahoier-media-cleanup --project-ref eaoyqyegfyejywfvujyr`.
+2. V Supabase Vault shrani `ahoier_project_url` (URL projekta) in `ahoier_cleanup_secret_key` (projektni secret API key). Ključa ne zapiši v Git ali odjemalca.
+3. Kot lastnik v SQL Editorju izvedi [`ahoier_media_cleanup.sql`](../supabase/cron/ahoier_media_cleanup.sql). Opravilo pokliče funkcijo na 15 minut. V Supabase Cron spremljaj uspešnost izvajanja in napake funkcije.
+
+Zasebni bucket ni zagotovilo, da član ne more shraniti fotografije, ki jo vidi. Ahoier zato ob deljenju opozori, da se lahko plovbi pridruži vsak prijavljen odrasel uporabnik. Pri preverjanju uporabi ločen testni projekt ali testne račune in preveri, da uporabnik brez članstva ne more brati medijev druge plovbe.

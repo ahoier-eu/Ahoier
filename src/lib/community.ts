@@ -10,7 +10,7 @@ export const TRAVEL_GROUP_LABELS: Record<Exclude<TravelGroup, "">, string> = {
   family: "Mit Familie",
   friends: "Mit Freunden",
 };
-export type Profile = { name: string; bio: string; interests: string[]; travelGroup: TravelGroup };
+export type Profile = { name: string; bio: string; interests: string[]; travelGroup: TravelGroup; photo?: string; adultConfirmed?: boolean };
 export type DemoPerson = { id: string; name: string; travelGroup: Exclude<TravelGroup, "">; interests: readonly string[]; intro: string };
 // Fictional preview personas only. They are never registered users or voyage members.
 export const DEMO_PEOPLE: readonly DemoPerson[] = [
@@ -36,12 +36,20 @@ export const DEMO_PEOPLE: readonly DemoPerson[] = [
   { id: "demo-mila", name: "Mila", travelGroup: "friends", interests: ["Entspannt treffen", "Spiele"], intro: "Findet, dass eine kleine Spielrunde schnell verbindet." },
 ];
 export type Meeting = { id: string; author: string; name: string; title: string; place: string; date: string; time: string; capacity: number; members: string[]; memberCounts: Record<string, number>; description: string; familyFriendly: boolean; cancelled: boolean; demo: boolean };
-export type Post = { id: string; author: string; name: string; category: string; body: string; created: string; demo: boolean; replies: { id: string; name: string; body: string }[]; helpful: boolean };
+export const DEMO_EMOJI = ["👍", "❤️", "😂", "😮", "🎉"] as const;
+export type DemoEmoji = typeof DEMO_EMOJI[number];
+export type DemoReactions = Record<string, DemoEmoji>;
+export type DemoReply = { id: string; name: string; body: string; author?: string; photo?: string; reactions?: DemoReactions };
+export type Post = { id: string; author: string; name: string; category: string; body: string; created: string; demo: boolean; replies: DemoReply[]; helpful: boolean; photos?: string[]; reactions?: DemoReactions };
 export type Message = { id: string; meeting: string; body: string; name: string; created: string };
-export type Space = { meetings: Meeting[]; posts: Post[]; messages: Message[]; hidden: string[]; blocked: string[] };
-export type CommunityState = { version: 1; profile: Profile; spaces: Record<string, Space> };
+export type DemoStory = { id: string; author: string; name: string; caption: string; photo: string; created: string; expires: string; demo: boolean };
+export type DemoDirectMessage = { id: string; person: string; body: string; created: string; from: "self" | "demo"; demo: boolean };
+export type Space = { meetings: Meeting[]; posts: Post[]; messages: Message[]; hidden: string[]; blocked: string[]; stories?: DemoStory[]; friendRequests?: string[]; friends?: string[]; directMessages?: DemoDirectMessage[] };
+export type CommunityState = { version: 1; profile: Profile; spaces: Record<string, Space>; friends?: string[]; friendRequests?: string[]; directMessages?: DemoDirectMessage[]; blockedPeople?: string[] };
 export const SELF = "local-guest";
-export const freshState = (): CommunityState => ({ version: 1, profile: { name: "", bio: "", interests: [], travelGroup: "" }, spaces: {} });
+export const freshState = (): CommunityState => ({ version: 1, profile: { name: "", bio: "", interests: [], travelGroup: "" }, spaces: {}, friends: ["demo-lena"], friendRequests: [], blockedPeople: [], directMessages: [
+  { id: "demo-hello", person: "demo-lena", body: "Beispielnachricht: Ahoi! So könnte ein privater Chat nach einer angenommenen Freundschaft aussehen.", created: "2026-10-01T10:15:00", from: "demo", demo: true },
+] });
 
 export function scopeKey(ship: string, from: string, to: string) { return `${ship}|${from}|${to}`; }
 export function examples(from: string, to?: string, now: Date = new Date()): Space {
@@ -61,8 +69,8 @@ export function examples(from: string, to?: string, now: Date = new Date()): Spa
   return {
     meetings: demoMeetings.filter(meeting => to === undefined || meeting.date <= to),
     posts: [
-      { id: "demo-question", author: "demo-lena", name: "Lena", category: "Frage", body: "Wo würdet ihr euch für einen ruhigen Spielenachmittag treffen? Ich freue mich über eure Ideen!", created: `${from}T10:00:00`, demo: true, replies: [], helpful: false },
-      { id: "demo-tip", author: "demo-mira", name: "Mira", category: "Tipp", body: "Allein unterwegs? Erst ein kleines Treffen mit wenigen Leuten ausprobieren – ein gemeinsamer Kaffee ist ein schöner Anfang.", created: `${from}T09:00:00`, demo: true, replies: [], helpful: false },
+      { id: "demo-question", author: "demo-lena", name: "Lena", category: "Frage", body: "Wo würdet ihr euch für einen ruhigen Spielenachmittag treffen? Ich freue mich über eure Ideen!", created: `${from}T10:00:00`, demo: true, replies: [{ id: "demo-answer", name: "Mira", author: "demo-mira", body: "Beispielantwort: Ein öffentliches Café wäre ein guter Anfang.", reactions: { "demo-lena": "❤️" } }], helpful: false, reactions: { "demo-ben": "👍", "demo-mira": "❤️" } },
+      { id: "demo-tip", author: "demo-mira", name: "Mira", category: "Tipp", body: "Allein unterwegs? Erst ein kleines Treffen mit wenigen Leuten ausprobieren – ein gemeinsamer Kaffee ist ein schöner Anfang.", created: `${from}T09:00:00`, demo: true, replies: [], helpful: false, reactions: { "demo-lena": "👍" } },
     ], messages: [], hidden: [], blocked: [],
   };
 }
@@ -99,6 +107,38 @@ function normalizeMeeting(v: unknown): Meeting | null {
 function validPost(v: unknown): v is Post {
   return record(v) && [v.id, v.author, v.name, v.body, v.created].every(x => string(x)) && CATEGORIES.includes(v.category as typeof CATEGORIES[number]) && typeof v.demo === "boolean" && typeof v.helpful === "boolean" && Array.isArray(v.replies) && v.replies.length <= 100 && v.replies.every(r => record(r) && [r.id, r.name, r.body].every(x => string(x)));
 }
+const mediaKey = (v: unknown): v is string => typeof v === "string" && /^demo-media:[0-9a-f-]{36}$/.test(v);
+function cleanReactions(v: unknown): DemoReactions {
+  if (!record(v)) return {};
+  return Object.fromEntries(Object.entries(v).slice(0, 100).filter(([person, emoji]) => string(person, 100) && (DEMO_EMOJI as readonly unknown[]).includes(emoji))) as DemoReactions;
+}
+function normalizePost(v: unknown): Post | null {
+  if (!validPost(v)) return null;
+  const reactions = cleanReactions(v.reactions);
+  if (v.helpful && !reactions[SELF]) reactions[SELF] = "👍";
+  return {
+    ...v,
+    photos: Array.isArray(v.photos) ? v.photos.filter(mediaKey).slice(0, 4) : [],
+    reactions,
+    replies: v.replies.map(reply => ({ id: reply.id, name: reply.name, body: reply.body,
+      author: string(reply.author, 100) ? reply.author : undefined,
+      photo: mediaKey(reply.photo) ? reply.photo : undefined,
+      reactions: cleanReactions(reply.reactions),
+    })),
+  };
+}
+function normalizeStories(v: unknown): DemoStory[] {
+  if (!Array.isArray(v)) return [];
+  return v.slice(0, 100).filter((story): story is DemoStory => record(story)
+    && [story.id, story.author, story.name, story.caption, story.created, story.expires].every(x => string(x, 250))
+    && mediaKey(story.photo) && typeof story.demo === "boolean");
+}
+function normalizeDirectMessages(v: unknown): DemoDirectMessage[] {
+  if (!Array.isArray(v)) return [];
+  return v.slice(-500).filter((message): message is DemoDirectMessage => record(message)
+    && [message.id, message.person, message.body, message.created].every(x => string(x, 1000))
+    && (message.from === "self" || message.from === "demo") && typeof message.demo === "boolean");
+}
 export function decodeState(raw: string): CommunityState {
   try {
     const v: unknown = JSON.parse(raw);
@@ -106,9 +146,19 @@ export function decodeState(raw: string): CommunityState {
     const spaces: Record<string, Space> = {};
     for (const [key, s] of Object.entries(v.spaces).slice(0, 100)) {
       if (!key.includes("|") || !record(s) || !Array.isArray(s.meetings) || !Array.isArray(s.posts) || !Array.isArray(s.messages) || !list(s.hidden) || !list(s.blocked)) continue;
-      spaces[key] = { meetings: s.meetings.map(normalizeMeeting).filter((meeting): meeting is Meeting => meeting !== null).slice(0, 100), posts: s.posts.filter(validPost).slice(0, 100), messages: s.messages.filter((m): m is Message => record(m) && [m.id, m.meeting, m.body, m.name, m.created].every(x => string(x))).slice(-500), hidden: s.hidden, blocked: s.blocked };
+      spaces[key] = { meetings: s.meetings.map(normalizeMeeting).filter((meeting): meeting is Meeting => meeting !== null).slice(0, 100), posts: s.posts.map(normalizePost).filter((post): post is Post => post !== null).slice(0, 100), messages: s.messages.filter((m): m is Message => record(m) && [m.id, m.meeting, m.body, m.name, m.created].every(x => string(x))).slice(-500), hidden: s.hidden, blocked: s.blocked,
+        stories: normalizeStories(s.stories), friends: list(s.friends) ? s.friends.filter(id => DEMO_PEOPLE.some(person => person.id === id)).slice(0, 20) : [],
+        friendRequests: list(s.friendRequests) ? s.friendRequests.filter(id => DEMO_PEOPLE.some(person => person.id === id)).slice(0, 20) : [],
+        directMessages: normalizeDirectMessages(s.directMessages) };
     }
-    return { version: 1, profile: { name: v.profile.name, bio: v.profile.bio, interests: v.profile.interests.filter(i => INTERESTS.includes(i)), travelGroup: validTravelGroup(v.profile.travelGroup) ? v.profile.travelGroup : "" }, spaces };
+    const validPeople = (people: unknown) => list(people) ? people.filter(id => DEMO_PEOPLE.some(person => person.id === id)).slice(0, 20) : [];
+    const defaults = freshState();
+    return { version: 1, profile: { name: v.profile.name, bio: v.profile.bio, interests: v.profile.interests.filter(i => INTERESTS.includes(i)), travelGroup: validTravelGroup(v.profile.travelGroup) ? v.profile.travelGroup : "", photo: mediaKey(v.profile.photo) ? v.profile.photo : undefined, adultConfirmed: v.profile.adultConfirmed === true }, spaces,
+      friends: v.friends === undefined ? defaults.friends : validPeople(v.friends),
+      friendRequests: validPeople(v.friendRequests),
+      blockedPeople: validPeople(v.blockedPeople),
+      directMessages: v.directMessages === undefined ? defaults.directMessages : normalizeDirectMessages(v.directMessages),
+    };
   } catch { return freshState(); }
 }
 

@@ -150,3 +150,64 @@ test('storage rejects inconsistent party counts without dropping other meetings'
   assert.equal(restored.profile.travelGroup,'family');
   assert.deepEqual(restored.spaces[key].meetings.map(m=>m.id),[valid.id]);
 });
+
+test('demo wall restores photo-only posts, replies, stories, reactions and age confirmation', () => {
+  const media = 'demo-media:aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
+  const key = scopeKey('AIDAcosma', '2026-10-01', '2026-10-08');
+  const state = freshState();
+  state.profile.name = 'Gast';
+  state.profile.photo = media;
+  state.profile.adultConfirmed = true;
+  state.spaces[key] = examples('2026-10-01');
+  state.spaces[key].posts.unshift({ id: 'local-photo', author: 'local-guest', name: 'Gast', category: 'Tipp', body: '', created: '2026-10-01T12:00:00', demo: false, helpful: false, photos: [media], reactions: { 'local-guest': '🎉' }, replies: [{ id: 'reply-photo', name: 'Gast', author: 'local-guest', body: '', photo: media, reactions: { 'local-guest': '❤️' } }] });
+  state.spaces[key].stories = [{ id: 'local-story', author: 'local-guest', name: 'Gast', caption: 'Ahoi', photo: media, created: '2026-10-01T12:00:00Z', expires: '2026-10-02T12:00:00Z', demo: false }];
+  const restored = decodeState(JSON.stringify(state));
+  assert.equal(restored.profile.photo, media);
+  assert.equal(restored.profile.adultConfirmed, true);
+  assert.deepEqual(restored.spaces[key].posts[0].photos, [media]);
+  assert.equal(restored.spaces[key].posts[0].body, '');
+  assert.equal(restored.spaces[key].posts[0].replies[0].photo, media);
+  assert.equal(restored.spaces[key].posts[0].replies[0].reactions['local-guest'], '❤️');
+  assert.equal(restored.spaces[key].posts[0].reactions['local-guest'], '🎉');
+  assert.equal(restored.spaces[key].stories[0].photo, media);
+});
+
+test('demo social preview rejects invalid media and reaction data but retains older v1 content', () => {
+  const key = scopeKey('AIDAcosma', '2026-10-01', '2026-10-08');
+  const state = freshState();
+  state.spaces[key] = examples('2026-10-01');
+  state.spaces[key].posts[0].photos = ['https://example.com/tracker.jpg', 'demo-media:aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa'];
+  state.spaces[key].posts[0].reactions = { bad: 'wrong', 'demo-ben': '👍' };
+  state.friends = ['demo-lena', 'unknown-person'];
+  const restored = decodeState(JSON.stringify(state));
+  assert.deepEqual(restored.spaces[key].posts[0].photos, ['demo-media:aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa']);
+  assert.deepEqual(restored.spaces[key].posts[0].reactions, { 'demo-ben': '👍' });
+  assert.deepEqual(restored.friends, ['demo-lena']);
+  assert.equal(restored.spaces[key].posts.length, 2);
+  assert.equal(restored.spaces[key].posts[1].demo, true);
+});
+
+test('an older helpful mark becomes the current user’s thumbs-up reaction', () => {
+  const key = scopeKey('AIDAcosma', '2026-10-01', '2026-10-08');
+  const state = freshState();
+  state.spaces[key] = examples('2026-10-01');
+  state.spaces[key].posts[0].helpful = true;
+  const restored = decodeState(JSON.stringify(state));
+  assert.equal(restored.spaces[key].posts[0].reactions['local-guest'], '👍');
+});
+
+test('fictional demo contacts and messages persist outside voyage-specific spaces', () => {
+  const one = scopeKey('AIDAcosma', '2026-10-01', '2026-10-08');
+  const two = scopeKey('AIDAnova', '2026-10-10', '2026-10-17');
+  const state = freshState();
+  state.spaces[one] = examples('2026-10-01');
+  state.spaces[two] = examples('2026-10-10');
+  state.friends = ['demo-lena', 'demo-mira'];
+  state.directMessages.push({ id: 'local-message', person: 'demo-mira', body: 'Ahoi', created: '2026-10-02T12:00:00Z', from: 'self', demo: false });
+  const restored = decodeState(JSON.stringify(state));
+  assert.deepEqual(restored.friends, ['demo-lena', 'demo-mira']);
+  assert.equal(restored.directMessages.at(-1).body, 'Ahoi');
+  assert.equal(restored.spaces[one].posts.length, 2);
+  assert.equal(restored.spaces[two].posts.length, 2);
+  assert.equal(restored.directMessages[0].demo, true);
+});
