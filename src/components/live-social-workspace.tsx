@@ -381,7 +381,9 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
   async function sendFriendRequest(otherId: string) {
     await perform(async () => {
       const result = await client.rpc("ahoier_send_friend_request", { p_other_user: otherId });
-      if (result.error) throw new Error("Die Freundschaftsanfrage konnte nicht gesendet werden.");
+      if (result.error) throw new Error(result.error.message.includes("Too many friend requests")
+        ? "Du hast heute schon viele Anfragen gesendet. Versuche es morgen erneut."
+        : "Die Freundschaftsanfrage konnte nicht gesendet werden.");
     }, "Anfrage gesendet.");
   }
 
@@ -429,7 +431,9 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
     if (!activePeer || !body || body.length > 1000) return;
     await perform(async () => {
       const result = await client.rpc("ahoier_send_message", { p_recipient_id: activePeer, p_body: body });
-      if (result.error) throw new Error("Die Nachricht konnte nicht gesendet werden.");
+      if (result.error) throw new Error(result.error.message.includes("Too many messages")
+        ? "Du hast in der letzten Stunde schon viele Nachrichten gesendet. Versuche es später erneut."
+        : "Die Nachricht konnte nicht gesendet werden.");
       if (typeof result.data === "string") setConversation(current => mergeMessages(current, [{ id: result.data, sender_id: userId, recipient_id: activePeer, body, created_at: new Date().toISOString() }]));
       setMessageBody("");
     });

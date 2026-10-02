@@ -85,6 +85,18 @@ create unique index ahoier_friend_pair_idx on public.ahoier_friend_requests (
 );
 create index ahoier_friend_recipient_idx on public.ahoier_friend_requests (recipient_id, created_at desc);
 
+-- A cancelled request still counts towards the daily contact limit. This
+-- private ledger prevents cancelling and resending to evade that limit.
+create table ahoier_private.ahoier_friend_request_attempts (
+  id uuid primary key default gen_random_uuid(),
+  requester_id uuid not null references public.ahoier_profiles(user_id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+create index ahoier_friend_request_attempts_user_idx
+  on ahoier_private.ahoier_friend_request_attempts (requester_id, created_at desc);
+alter table ahoier_private.ahoier_friend_request_attempts enable row level security;
+revoke all on ahoier_private.ahoier_friend_request_attempts from public, anon, authenticated;
+
 create table public.ahoier_blocks (
   blocker_id uuid not null references public.ahoier_profiles(user_id) on delete cascade,
   blocked_id uuid not null references public.ahoier_profiles(user_id) on delete cascade,
@@ -764,6 +776,12 @@ begin
     -- action. This prevents a rejected member from spamming fresh requests.
     raise exception 'Request was declined' using errcode = '22023';
   end if;
+  perform 1 from public.ahoier_profiles p where p.user_id = v_user for update;
+  if (select count(*) from ahoier_private.ahoier_friend_request_attempts a
+    where a.requester_id = v_user and a.created_at > now() - interval '1 day') >= 20 then
+    raise exception 'Too many friend requests today' using errcode = '22023';
+  end if;
+  insert into ahoier_private.ahoier_friend_request_attempts (requester_id) values (v_user);
   insert into public.ahoier_friend_requests (requester_id, recipient_id)
   values (v_user, p_other_user) returning id into v_request.id;
   return v_request.id;
@@ -874,6 +892,11 @@ begin
     or ahoier_private.ahoier_is_blocked(v_user, p_recipient_id)
     or not ahoier_private.ahoier_are_friends(v_user, p_recipient_id) then
     raise exception 'Message cannot be sent' using errcode = '42501';
+  end if;
+  perform 1 from public.ahoier_profiles p where p.user_id = v_user for update;
+  if (select count(*) from public.ahoier_messages m
+    where m.sender_id = v_user and m.created_at > now() - interval '1 hour') >= 60 then
+    raise exception 'Too many messages this hour' using errcode = '22023';
   end if;
   insert into public.ahoier_messages (sender_id, recipient_id, body)
   values (v_user, p_recipient_id, p_body) returning id into v_id;
@@ -1109,6 +1132,8 @@ revoke all on ahoier_private.ahoier_media_cleanup_queue from public, anon, authe
 create function ahoier_private.ahoier_cleanup_candidates_impl()
 returns table(path text) language plpgsql volatile security definer set search_path = '' as $$
 begin
+  delete from ahoier_private.ahoier_friend_request_attempts
+  where created_at < now() - interval '2 days';
   delete from public.ahoier_stories s
   where s.published_at is null and s.created_at <= now() - interval '1 day';
   delete from public.ahoier_replies r

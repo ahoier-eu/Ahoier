@@ -260,6 +260,13 @@ test("social migration isolates voyages, drafts, media, messaging and moderation
       "select count(*)::int as n from public.ahoier_messages where id=$1", [messageId]))[0].n, 0);
     assert.equal((await asUser(db, users.bob,
       "select count(*)::int as n from public.ahoier_messages where id=$1", [messageId]))[0].n, 1);
+    for (let i = 0; i < 59; i++) {
+      await query(db,
+        "insert into public.ahoier_messages(sender_id,recipient_id,body) values($1,$2,'Rate test')",
+        [users.alice, users.bob]);
+    }
+    await assert.rejects(asUser(db, users.alice,
+      "select public.ahoier_send_message($1,'One too many')", [users.bob]));
     await asUser(db, users.bob, "select public.ahoier_block_user($1)", [users.alice]);
     await assert.rejects(asUser(db, users.alice,
       "select public.ahoier_send_message($1,'Blocked')", [users.bob]));
@@ -310,6 +317,25 @@ test("social migration isolates voyages, drafts, media, messaging and moderation
     await assert.rejects(asUser(db, users.alice,
       "insert into public.ahoier_posts(voyage_id,author_id,category,body,published_at) values($1,$2,'Frage','',null)",
       [voyage, users.alice]));
+
+    let firstRequestId = "";
+    for (let i = 1; i <= 20; i++) {
+      const other = `66666666-6666-4666-8666-${String(i).padStart(12, "0")}`;
+      await query(db, "insert into auth.users(id) values($1)", [other]);
+      await query(db,
+        "insert into public.ahoier_profiles(user_id,display_name,adult_confirmed_at) values($1,$2,now())",
+        [other, `guest${i}`]);
+      await query(db, "insert into public.ahoier_memberships(voyage_id,user_id) values($1,$2)",
+        [voyage, other]);
+      if (i <= 19) {
+        const request = await asUser(db, users.alice,
+          "select public.ahoier_send_friend_request($1) as id", [other]);
+        if (i === 1) firstRequestId = request[0].id;
+        if (i === 19) await asUser(db, users.alice,
+          "select public.ahoier_cancel_friend_request($1)", [firstRequestId]);
+      } else await assert.rejects(asUser(db, users.alice,
+        "select public.ahoier_send_friend_request($1)", [other]));
+    }
   } finally {
     await db.close();
   }
