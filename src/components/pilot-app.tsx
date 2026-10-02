@@ -145,7 +145,7 @@ export function PilotApp() {
   const previous = data?.authenticated ? data.meetings.filter(meeting => !isUpcomingMeeting(meeting, now, timeZone) && (!onlyMine || meeting.myCount > 0)) : [];
   const firstDate = data?.authenticated ? (data.voyage.from > current.date ? data.voyage.from : current.date) : current.date;
 
-  return <div className="pilot-shell"><header className="pilot-header"><Link href="/" className="pilot-brand" aria-label="Ahoier Startseite">ahoier<span>.</span></Link><span className="pilot-header-label">EINLADUNGSPILOT</span><Link href="/" className="pilot-home"><ArrowLeft size={16} aria-hidden="true" /> Vorschau</Link></header>
+  return <div className="pilot-shell"><header className="pilot-header"><Link href="/" className="pilot-brand" aria-label="Ahoier Startseite">ahoier<span>.</span></Link><span className="pilot-header-label">EINLADUNGSPILOT</span><Link href="/demo" className="pilot-home"><ArrowLeft size={16} aria-hidden="true" /> Vorschau</Link></header>
     <main className="pilot-main">
       {!data ? <div className="pilot-loading" role="status">{error ? <button className="pilot-secondary" onClick={() => void refresh()}>Erneut versuchen</button> : "Pilotbereich wird geladen …"}</div> : !data.authenticated ? <>
         <section className="pilot-intro"><span className="pilot-eyebrow">ZUSAMMEN MEHR MEER</span><h1>Aus Ahoi wird ein Treffen.</h1><p>Hier organisieren eingeladene Gäste einer Pilotreise gemeinsame Momente. Mit einem Code kommst du zur richtigen Reisegruppe.</p></section>

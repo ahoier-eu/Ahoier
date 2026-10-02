@@ -44,6 +44,28 @@ Za osebno vabilo uporabi `max_uses = 1`. Ob uporabi se poveča števec in ustvar
 
 Prijavljeni uporabnik mora najprej ustvariti `ahoier_profiles` vrstico s svojim `auth.uid()` in prikaznim imenom, nato odjemalec kliče `supabase.rpc('ahoier_join_voyage', { p_code: code })`; vrnjena vrednost je UUID plovbe. Objave so vezane na ta UUID, ne na poljubno kombinacijo ladje in datumov.
 
+### Kako admin preveri vabilo
+
+V bazi ni izvirne 32-mestne kode, temveč samo njen SHA-256 hash. Zato iz Supabase ne moreš prebrati pozabljene kode. Za preverjanje kode, ki jo imaš, na svojem računalniku zaženi `node scripts/hash-ahoier-invite.mjs` in jo vnesi v poziv. Skript izpiše samo hash; kode ne dodajaj v ukazno vrstico, SQL Editor ali Git.
+
+V **Supabase SQL Editorju** kot lastnik projekta vstavi izpisani hash v spodnjo poizvedbo. Pokaže pripadajočo plovbo in uporabnost vabila za **novega** člana. Če ne vrne vrstice, v bazi ni vabila s tem hashom.
+
+```sql
+select v.ship, v.starts_on, v.ends_on, i.voyage_id,
+       i.uses, i.max_uses, i.expires_at, i.revoked_at,
+       case
+         when i.revoked_at is not null then 'preklicano'
+         when i.expires_at <= now() then 'poteklo'
+         when i.uses >= i.max_uses then 'porabljeno'
+         else 'veljavno'
+       end as status_za_novega_clana
+from ahoier_private.ahoier_invites i
+join public.ahoier_voyages v on v.id = i.voyage_id
+where i.code_hash = '64_MESTNI_HASH_IZ_SKRIPTA';
+```
+
+Eni plovbi lahko pripada več različnih vabil. Osebno vabilo z `max_uses = 1` po prvi uporabi za drugega gosta ni več veljavno; uporabnik, ki je že član plovbe, ob ponovnem vnosu svoje kode ne porabi dodatne uporabe. Če izvirno kodo izgubiš, ustvari novo vabilo in starega po potrebi prekliči. Admin preverjanje izvajaj v SQL Editorju, ne v odjemalski aplikaciji.
+
 ## 4. Ročna moderacija
 
 Gostu je uspešna prijava shranjena v `ahoier_reports`; **pregledovanje in odziv potekata ročno v SQL Editorju** z upravljavsko vlogo. Naslednja poizvedba pokaže prijave, izvirni posnetek prijavljenega besedila in še obstoječo vsebino. Če je avtor vsebino izbrisal, `current_body` postane `NULL`, posnetek pa ostane za pregled.

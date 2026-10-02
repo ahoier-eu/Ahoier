@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const config: NextConfig = {
   devIndicators: false,
-  outputFileTracingIncludes: { "/": ["./data/itineraries.csv"], "/reise": ["./data/itineraries.csv"], "/api/itinerary": ["./data/itineraries.csv"] },
+  outputFileTracingIncludes: { "/demo": ["./data/itineraries.csv"], "/reise": ["./data/itineraries.csv"], "/api/itinerary": ["./data/itineraries.csv"] },
   async headers() {
     return [{ source: "/(.*)", headers: [
       { key: "X-Content-Type-Options", value: "nosniff" },

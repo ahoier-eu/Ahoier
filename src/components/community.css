@@ -111,3 +111,31 @@
 .social-app .social-footer a{text-decoration:underline;text-underline-offset:2px}
 .social-live-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 21px;margin-bottom:16px;border-radius:17px;background:linear-gradient(105deg,#1d5558,#367e79);color:#fff}.social-live-banner>div{min-width:0}.social-live-banner .live-banner-eyebrow{display:block;color:#c7e8e1;font-size:9px;font-weight:800;letter-spacing:1.4px;margin-bottom:4px}.social-live-banner strong{display:block;font-family:'Bricolage Grotesque',Arial,sans-serif;font-size:20px;line-height:1.25}.social-live-banner p{color:#e1f0ed;font-size:12px;margin-top:4px}.social-live-banner>a{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;background:#fff;color:#1d6c67;border-radius:9px;padding:10px 12px;min-height:40px;font-size:12px;font-weight:800}
 @media(max-width:600px){.social-live-banner{align-items:stretch;flex-direction:column;padding:15px;margin-bottom:12px}.social-live-banner strong{font-size:18px}.social-live-banner>a{width:100%}}
+
+/* Fictional people are visible only in the local demo, never as live guests. */
+.demo-people-teaser{width:100%;display:flex;align-items:center;gap:13px;text-align:left;border:1px solid #d6e7e2;background:#f3f8f5;border-radius:15px;padding:12px 15px;color:#234f50;cursor:pointer}
+.demo-people-teaser:hover{background:#eaf4ee;border-color:#a9d0c3}
+.demo-people-teaser:focus-visible{outline:3px solid #297f76;outline-offset:2px}
+.demo-people-avatars{display:flex;align-items:center;padding-left:5px;flex-shrink:0}
+.demo-people-avatars .social-avatar{width:29px;height:29px;font-size:12px;border:2px solid #f3f8f5;margin-left:-5px}
+.demo-people-teaser-copy{flex:1;min-width:0}
+.demo-people-teaser-copy strong,.demo-people-teaser-copy small{display:block}
+.demo-people-teaser-copy strong{font-size:13px;line-height:1.3}
+.demo-people-teaser-copy small{font-size:11px;color:#5d7775;margin-top:2px}
+.demo-people-teaser>svg{flex-shrink:0}
+.board-stream>.demo-people-teaser+.onboard-invitations-title{margin-top:24px}
+.demo-people{margin-top:36px;scroll-margin-top:20px}
+.demo-people:focus-visible{outline:3px solid #297f76;outline-offset:5px;border-radius:8px}
+.demo-people-heading{margin-bottom:17px}
+.demo-people-heading h2{font-size:24px;line-height:1.3;margin-top:10px}
+.demo-people-heading p{font-size:12px;line-height:1.6;color:#607577;margin-top:7px}
+.demo-people-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.demo-person{display:flex;align-items:flex-start;gap:10px;min-width:0;padding:13px;background:#fff;border:1px solid var(--line);border-radius:13px}
+.demo-person>.social-avatar{width:36px;height:36px;font-size:15px}
+.demo-person>div{min-width:0}
+.demo-person h3{font-size:14px;line-height:1.2}
+.demo-person small{display:block;font-size:10px;color:#69807d;margin-top:2px}
+.demo-person p{font-size:11px;line-height:1.5;color:#4d6768;margin:7px 0;overflow-wrap:anywhere}
+.demo-person-interests{display:flex;flex-wrap:wrap;gap:4px}
+.demo-person-interests span{font-size:10px;background:#edf4f1;color:#3d736b;padding:3px 6px;border-radius:6px}
+@media(max-width:600px){.demo-people-grid{grid-template-columns:1fr}.demo-people-teaser{padding:10px 12px}.demo-people-heading h2{font-size:21px}}

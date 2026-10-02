@@ -1,17 +1,17 @@
 # Ahoier
 
-Samostojen začetni projekt za goste AIDA. Poudarek je na druženju na ladji, srečanjih in izmenjavi informacij med gosti. Začetna stran je **lokalni interaktivni predogled**; po konfiguraciji Supabase se od tam odpre ločena skupna skupnost za povabljene člane potovanja. Ločeni `/pilot` še vedno omogoča preizkus srečanj v lokalni strežniški bazi.
+Samostojen začetni projekt za goste AIDA. Poudarek je na druženju na ladji, srečanjih in izmenjavi informacij med gosti. Začetna stran `/` je kratek javni vhod v Ahoier; `/demo` je jasno označen lokalni interaktivni predogled, `/community` pa skupna Supabase skupnost za povabljene člane potovanja. Ločeni `/pilot` še vedno omogoča preizkus srečanj v lokalni strežniški bazi.
 
 ## Lokalni družabni predogled (brez Supabase)
 
-- `/`: začetna stran »An Bord«, srečanja, skupnost, skupinski pogovori in lokalni profil.
+- `/demo`: predogled »An Bord«, srečanja, skupnost, skupinski pogovori in lokalni profil; začetna stran `/` jasno vodi v pravo skupnost ali predogled.
 - `/reise`: izbor ladje in datumov, itinerar iz vključenega podatkovnega posnetka, pristanišča in priljubljeni postanki.
 - Profil: prikazno ime, opis, interesi in neobvezna zasebna izbira, ali gost potuje sam, v paru, z družino ali prijatelji. Za ustvarjanje objav in prijavo na srečanje najprej shrani ime.
 - Srečanja: ustvarjanje, prijava/odjava, omejitev mest, iskanje, prikaz lastnih srečanj in odpoved organizatorja. Gost lahko prijavi 1–10 oseb skupaj, pozneje spremeni število mest; zasedenost šteje ljudi, ne profilov. Organizator lahko svoje srečanje označi kot primerno za družine, gostje pa taka srečanja filtrirajo.
 - Skupnost: kategorije, nove objave, odgovori, oznaka »koristno« in lokalno skrivanje vsebine.
 - Pogovori: lokalno shranjevanje sporočil pri srečanjih, ki se jim je uporabnik pridružil. Pri odpovedanem srečanju je vnos onemogočen.
 - Vsebina je ločena po ladji in izbranem datumskem razponu. To še ni identifikator potrjenega križarjenja ali preverjeno članstvo.
-- Ob prvem odpiranju so vidni jasno označeni primeri s fiktivnimi gosti, vključno z družinam primernim srečanjem. Nobeno prikazano srečanje ni uradni dogodek na ladji. Pri ponastavitvi se primeri obnovijo.
+- Ob prvem odpiranju je vidnih 20 jasno označenih fiktivnih oseb in primeri srečanj, vključno z družinam primernim srečanjem. Nobena prikazana oseba ni resnični gost; nobeno srečanje ni uradni dogodek na ladji. Pri ponastavitvi se primeri obnovijo.
 - Družabna začetna stran najprej pokaže izbrano ladjo in potovanje ter dve odprti srečanji. Običajno sta urejeni po datumu in uri; če profil navaja družinsko potovanje, imajo prednost srečanja z oznako »Für Familien«. Za njima so kratki dejanji za predlog srečanja ali vprašanje, Radar, tok pogovorov in pregled lastnih dogovorov. Na telefonu je naslednji lasten dogovor prikazan pred srečanji. Hitre ideje so skrite pod povezavo in predizpolnijo obrazec. Če gost ob prijavi še nima imena, se po shranitvi profila vrne k istemu srečanju in prijava se dokonča lokalno.
 - Mobilna začetna stran uporablja fotografijo izbrane ladje v nizki kartici potovanja. Srečanja imajo majhne barvne poudarke glede na opis dejavnosti, prijava pa pokaže lokalno potrditev s kratko animacijo, ki upošteva nastavitev za zmanjšano gibanje. Ilustracij ali fotografij izmišljenih gostov ni.
 - **Ahoi Radar** pomaga izbrati med prikazanimi prostimi srečanji po vrsti dejavnosti. Pri splošnem pogledu uredi predloge glede na interese iz lokalnega profila; če gost navede, da potuje z družino, da prednost označenim družinskim srečanjem. Ujemanje temelji na besedah iz naslova in opisa ter oznaki družinskega srečanja, ne na informacijah o resničnih gostih. Če ni ujemanja, ponudi predizpolnjen predlog za novo srečanje.
@@ -23,7 +23,7 @@ Podatki **lokalne predogledne skupnosti** se hranijo pod `ahoier:community:v1` v
 
 ## Skupnost s Supabase
 
-Ko nastaviš `NEXT_PUBLIC_SUPABASE_URL` in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ter izvedeš SQL migracijo, se odpre `/community`: prijava z e-poštnim povezovalnim sporočilom, prikazno ime, vstop v potovanje s povabilom, objave, odgovori in prijava neprimerne vsebine. Začetna stran ostane predogled z jasno povezavo na skupno skupnost. Objave so vidne samo prijavljenim članom iste povabljene skupine. Koda ne potrjuje rezervacije ali identitete. Srečanja ostanejo v ločenem `/pilot`, Ahoi Dates pa lokalni zasebni predogled. Lokalnih profilov in objav ne prenašamo samodejno v Supabase.
+Ko nastaviš `NEXT_PUBLIC_SUPABASE_URL` in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ter izvedeš SQL migracijo, se odpre `/community`: prijava z e-poštnim povezovalnim sporočilom, prikazno ime, vstop v potovanje s povabilom, objave, odgovori in prijava neprimerne vsebine. Začetna stran `/` vodi v to skupnost; vzorčne osebe ostanejo izključno na `/demo`. Objave so vidne samo prijavljenim članom iste povabljene skupine. Koda ne potrjuje rezervacije ali identitete. Srečanja ostanejo v ločenem `/pilot`, Ahoi Dates pa lokalni zasebni predogled. Lokalnih profilov in objav ne prenašamo samodejno v Supabase.
 
 Navodila za nastavitev projekta, varnostnih pravil in povabil so v [docs/SUPABASE.md](docs/SUPABASE.md). V `.env.local` sodita samo **Project URL** in **publishable key**; skrivnega ključa ne dodajaj v aplikacijo ali Git.
 

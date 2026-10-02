@@ -11,6 +11,30 @@ export const TRAVEL_GROUP_LABELS: Record<Exclude<TravelGroup, "">, string> = {
   friends: "Mit Freunden",
 };
 export type Profile = { name: string; bio: string; interests: string[]; travelGroup: TravelGroup };
+export type DemoPerson = { id: string; name: string; travelGroup: Exclude<TravelGroup, "">; interests: readonly string[]; intro: string };
+// Fictional preview personas only. They are never registered users or voyage members.
+export const DEMO_PEOPLE: readonly DemoPerson[] = [
+  { id: "demo-lena", name: "Lena", travelGroup: "solo", interests: ["Spiele", "Musik"], intro: "Freut sich über eine kleine Spielrunde und neue Gespräche." },
+  { id: "demo-ben", name: "Ben", travelGroup: "solo", interests: ["Sport", "Spiele"], intro: "Ist gern aktiv und probiert auch neue Brettspiele aus." },
+  { id: "demo-tom", name: "Tom", travelGroup: "friends", interests: ["Kulinarik", "Musik"], intro: "Mag gutes Essen und entspannte Abende in Gesellschaft." },
+  { id: "demo-mira", name: "Mira", travelGroup: "solo", interests: ["Entspannt treffen", "Ausflüge"], intro: "Lernt neue Menschen am liebsten bei einem Kaffee kennen." },
+  { id: "demo-sara", name: "Sara", travelGroup: "family", interests: ["Spiele", "Ausflüge"], intro: "Sucht unkomplizierte Ideen für gemeinsame Familienzeit." },
+  { id: "demo-lea", name: "Lea", travelGroup: "couple", interests: ["Musik", "Kulinarik"], intro: "Freut sich über nette Gespräche beim Essen oder Konzert." },
+  { id: "demo-jan", name: "Jan", travelGroup: "friends", interests: ["Sport", "Ausflüge"], intro: "Entdeckt gern Neues und ist bei einem Spaziergang dabei." },
+  { id: "demo-aylin", name: "Aylin", travelGroup: "solo", interests: ["Musik", "Entspannt treffen"], intro: "Findet, dass ein gutes Gespräch oft mit einem Ahoi beginnt." },
+  { id: "demo-paul", name: "Paul", travelGroup: "couple", interests: ["Spiele", "Kulinarik"], intro: "Mag spontane Spielideen und gemeinsames Abendessen." },
+  { id: "demo-nele", name: "Nele", travelGroup: "family", interests: ["Ausflüge", "Entspannt treffen"], intro: "Freut sich über ruhige Treffen mit anderen Familien." },
+  { id: "demo-karim", name: "Karim", travelGroup: "solo", interests: ["Sport", "Musik"], intro: "Teilt gern Musiktipps und bewegt sich am liebsten draußen." },
+  { id: "demo-frida", name: "Frida", travelGroup: "friends", interests: ["Kulinarik", "Ausflüge"], intro: "Probiert gern Neues und sammelt Ideen für Ausflüge." },
+  { id: "demo-elias", name: "Elias", travelGroup: "solo", interests: ["Spiele", "Entspannt treffen"], intro: "Ist für eine lockere Runde ohne große Planung zu haben." },
+  { id: "demo-maren", name: "Maren", travelGroup: "couple", interests: ["Musik", "Ausflüge"], intro: "Mag Live-Musik und gemeinsame Entdeckungen." },
+  { id: "demo-noah", name: "Noah", travelGroup: "friends", interests: ["Sport", "Spiele"], intro: "Sucht nette Leute für eine kleine Runde zwischendurch." },
+  { id: "demo-yasmin", name: "Yasmin", travelGroup: "solo", interests: ["Kulinarik", "Entspannt treffen"], intro: "Ein Kaffee und ein ehrliches Gespräch reichen ihr völlig." },
+  { id: "demo-oskar", name: "Oskar", travelGroup: "family", interests: ["Spiele", "Sport"], intro: "Freut sich über einfache Ideen, bei denen alle mitmachen können." },
+  { id: "demo-eva", name: "Eva", travelGroup: "couple", interests: ["Ausflüge", "Kulinarik"], intro: "Tauscht gern Tipps für gemeinsame Entdeckungen aus." },
+  { id: "demo-david", name: "David", travelGroup: "solo", interests: ["Musik", "Sport"], intro: "Mag Bewegung, Musik und Begegnungen ohne Druck." },
+  { id: "demo-mila", name: "Mila", travelGroup: "friends", interests: ["Entspannt treffen", "Spiele"], intro: "Findet, dass eine kleine Spielrunde schnell verbindet." },
+];
 export type Meeting = { id: string; author: string; name: string; title: string; place: string; date: string; time: string; capacity: number; members: string[]; memberCounts: Record<string, number>; description: string; familyFriendly: boolean; cancelled: boolean; demo: boolean };
 export type Post = { id: string; author: string; name: string; category: string; body: string; created: string; demo: boolean; replies: { id: string; name: string; body: string }[]; helpful: boolean };
 export type Message = { id: string; meeting: string; body: string; name: string; created: string };
