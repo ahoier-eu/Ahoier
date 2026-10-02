@@ -18,8 +18,8 @@ export function DemoStoryStrip({ stories, add, open, profile }: { stories: DemoS
     <div className="demo-section-head"><div><span className="eyebrow">MOMENTE AN BORD</span><h2>Stories</h2></div><span className="demo-pill">BEISPIELE + LOKALE ENTWÜRFE</span></div>
     <div className="demo-stories-row">
       <button className="demo-story-add" onClick={add} type="button"><DemoAvatar name={profile.name || "Du"} photo={profile.photo} /><span><Plus size={16} /> Dein Moment</span><small>Nur auf diesem Gerät</small></button>
-      {stories.map(story => <button type="button" onClick={() => open(story)} key={story.id} className="demo-story-card">
-        <DemoMediaImage source={story.photo} alt="" className="demo-story-photo" />
+      {stories.map((story, index) => <button type="button" onClick={() => open(story)} key={story.id} className="demo-story-card">
+        <DemoMediaImage source={story.photo} alt="" className="demo-story-photo" eager={index === 0} />
         <span className="demo-story-gradient" aria-hidden="true" />
         <span className="demo-story-owner"><DemoAvatar name={story.name} photo={story.author === SELF ? profile.photo : undefined} /><strong>{story.author === SELF ? "Deine Story" : story.name}</strong></span>
         <small>{story.demo ? "Beispiel · erfunden" : "Lokal · 24 Stunden"}</small>
