@@ -25,7 +25,7 @@ Podatki **lokalne predogledne skupnosti** se hranijo pod `ahoier:community:v1` v
 
 Ko nastaviš `NEXT_PUBLIC_SUPABASE_URL` in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ter izvedeš obe SQL migraciji, se odpre `/community`: prijava s povezavo po e-pošti, prikazno ime, izbor razpoložljive plovbe brez kode, objave, odgovori in prijava neprimerne vsebine. Začetna stran `/` vodi v to skupnost; vzorčne osebe ostanejo izključno na `/demo`. Vsak prijavljen uporabnik s profilom se lahko pridruži katerikoli plovbi, ki jo je ustvaril upravljavec. Objave so vidne članom iste plovbe, članstvo pa ni dokaz rezervacije, identitete ali prisotnosti na ladji. Srečanja ostanejo v ločenem `/pilot`, Ahoi Dates pa lokalni zasebni predogled. Lokalnih profilov in objav ne prenašamo samodejno v Supabase.
 
-Navodila za nastavitev projekta, varnostnih pravil in plovb so v [docs/SUPABASE.md](docs/SUPABASE.md). V `.env.local` sodita samo **Project URL** in **publishable key**; skrivnega ključa ne dodajaj v aplikacijo ali Git. Kode v ločenem pilotu `/pilot` ostanejo del njegovega lastnega sistema.
+Navodila za nastavitev projekta, varnostnih pravil, plovb in [objavo na Vercelu](docs/SUPABASE.md#6-objava-na-vercelu) so v [docs/SUPABASE.md](docs/SUPABASE.md). V `.env.local` sodita samo **Project URL** in **publishable key**; skrivnega ključa ne dodajaj v aplikacijo ali Git. Kode v ločenem pilotu `/pilot` ostanejo del njegovega lastnega sistema.
 
 ## Povabljeni pilot
 
@@ -47,7 +47,7 @@ npm run pilot:moderate -- --voyage ID_PILOTA --rotate-code ID_GOSTA
 
 Metrike prikazujejo izdane in uporabljene kode, število srečanj, prijavljenih mest, samoprijavljeno udeležbo oziroma odsotnost in prijave vsebine. Samoprijava ni dokaz dejanske prisotnosti; če je gost prijavil skupino, podatek velja samo za njegov odgovor, ne za vsako osebo v skupini. Poročila iz prijav pregleduje upravljavec lokalno; uporabnikom se ne razkrivajo. Z ukazom `pilot:moderate` lahko upravljavec tudi skrije ali odpove srečanje oziroma prekliče dostop udeležencu (`--hide-meeting ID`, `--cancel-meeting ID`, `--revoke-participant ID`). Če se osebna koda razkrije, `--rotate-code ID_GOSTA` izda novo kodo za istega gosta ter prekliče staro kodo in vse njegove seje, njegova srečanja in prijave pa ostanejo. Novo kodo upravljavec preda zasebno.
 
-Baza je privzeto v `data/ahoier-pilot.sqlite` (lahko jo nastaviš z `AHOIER_PILOT_DB`) in je izključena iz Gita. Pot pod javno mapo `public/` je zavrnjena. Ta izvedba je namenjena **enemu strežniku z obstojnim diskom**, ne več strežniškim replikam ali brezstanjskemu gostovanju. Za povabilo resničnih gostov so potrebni HTTPS, varnostne kopije, dejanski odziv na prijave vsebin in preverjanje dostopa do spletne strani na krovu.
+Baza je privzeto v `data/ahoier-pilot.sqlite` (lahko jo nastaviš z `AHOIER_PILOT_DB`) in je izključena iz Gita. Pot pod javno mapo `public/` je zavrnjena. Ta izvedba je namenjena **enemu strežniku z obstojnim diskom**, ne več strežniškim replikam ali brezstanjskemu gostovanju. Pri `npm start` na takem strežniku nastavi `AHOIER_PILOT_ENABLED=1`; na Vercelu je pilot vedno izklopljen. Za povabilo resničnih gostov so potrebni HTTPS, varnostne kopije, dejanski odziv na prijave vsebin in preverjanje dostopa do spletne strani na krovu.
 
 Testna posnetka mobilnega prikaza: [vstop](docs/screenshots/ahoier-pilot-entry-mobile.png) in [skupna srečanja](docs/screenshots/ahoier-pilot-guest-mobile.png).
 

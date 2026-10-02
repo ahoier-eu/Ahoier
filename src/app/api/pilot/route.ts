@@ -60,6 +60,10 @@ async function limitedJson(request: Request): Promise<Record<string, unknown>> {
 }
 
 export async function GET(request: NextRequest) {
+  // Never open the local SQLite database in serverless deployments.
+  if (process.env.VERCEL === "1" ||
+      (process.env.NODE_ENV === "production" && process.env.AHOIER_PILOT_ENABLED !== "1"))
+    return json({ error: "Nicht gefunden." }, 404);
   let db;
   try {
     db = openPilotDb();
@@ -72,6 +76,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (process.env.VERCEL === "1" ||
+      (process.env.NODE_ENV === "production" && process.env.AHOIER_PILOT_ENABLED !== "1"))
+    return json({ error: "Nicht gefunden." }, 404);
   // Origin is mandatory for cookie-authenticated mutations. No cross-origin CORS access is granted.
   if (!sameOriginMutation(request))
     return json({ error: "Anfrage von anderer Herkunft abgelehnt." }, 403);
