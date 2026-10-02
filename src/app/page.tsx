@@ -9,7 +9,7 @@ import "./landing.css";
 
 export const metadata: Metadata = {
   title: "Ahoier — Deine Reise. Deine Leute.",
-  description: "Ahoier verbindet AIDA-Gäste in privaten Reisegruppen für Fragen, Tipps und neue Bekanntschaften. Unabhängig von AIDA.",
+  description: "Ahoier verbindet AIDA-Gäste in offenen Reisegruppen für Fragen, Tipps und neue Bekanntschaften. Unabhängig von AIDA.",
 };
 
 export default function Home() {
@@ -33,12 +33,12 @@ export default function Home() {
         <div className="landing-copy">
           <span className="landing-kicker"><Ship size={17} /> UNABHÄNGIG · FÜR AIDA GÄSTE</span>
           <h1 id="landing-title">Deine Reise.<br /><span>Deine Leute.</span></h1>
-          <p>Frag Mitreisende, teile Tipps und lern Menschen in der privaten Gruppe deiner Reise kennen.</p>
+          <p>Stell Fragen, teile Tipps und lern Menschen in deiner Reisegruppe kennen.</p>
           <div className="landing-actions">
             <Link className="landing-primary" href={liveEnabled ? "/community" : "/demo"}>{liveEnabled ? "Zur Community" : "Demo ansehen"}<ArrowRight size={19} /></Link>
             {liveEnabled && <Link className="landing-secondary" href="/demo">Demo ansehen</Link>}
           </div>
-          <p className="landing-access-note">{liveEnabled ? "Anmeldung per E-Mail · Einladungscode für deine Reise nötig" : "Die gemeinsame Community wird eingerichtet. Die Demo zeigt Beispielinhalte."}</p>
+          <p className="landing-access-note">{liveEnabled ? "Anmeldung per E-Mail · Reise auswählen · kein Code nötig" : "Die gemeinsame Community wird eingerichtet. Die Demo zeigt Beispielinhalte."}</p>
           <Link className="landing-demo-people" href="/demo">
             <span className="landing-demo-avatars" aria-hidden="true">{DEMO_PEOPLE.slice(0, 5).map((person, index) => <span key={person.id} data-tone={index % 5}>{person.name[0]}</span>)}</span>
             <span><strong>{DEMO_PEOPLE.length} Beispielprofile in der Demo</strong><small>Erfundene Personen · keine echten Gäste</small></span>
@@ -59,7 +59,7 @@ export default function Home() {
 
       <section className="landing-steps" aria-label="So funktioniert Ahoier">
         <div><span className="landing-step-icon"><Mail size={20} /></span><strong>1. Anmelden</strong><p>Ein Link per E-Mail bringt dich an Bord.</p></div>
-        <div><span className="landing-step-icon"><Ship size={20} /></span><strong>2. Reisegruppe öffnen</strong><p>Mit einem Einladungscode findest du deine Gruppe.</p></div>
+        <div><span className="landing-step-icon"><Ship size={20} /></span><strong>2. Reise auswählen</strong><p>Wähle Schiff und Zeitraum aus der Liste.</p></div>
         <div><span className="landing-step-icon"><MessageCircle size={20} /></span><strong>3. Austauschen</strong><p>Fragen stellen, antworten und Tipps teilen.</p></div>
       </section>
 

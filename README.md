@@ -1,6 +1,6 @@
 # Ahoier
 
-Samostojen začetni projekt za goste AIDA. Poudarek je na druženju na ladji, srečanjih in izmenjavi informacij med gosti. Začetna stran `/` je kratek javni vhod v Ahoier; `/demo` je jasno označen lokalni interaktivni predogled, `/community` pa skupna Supabase skupnost za povabljene člane potovanja. Ločeni `/pilot` še vedno omogoča preizkus srečanj v lokalni strežniški bazi.
+Samostojen začetni projekt za goste AIDA. Poudarek je na druženju na ladji, srečanjih in izmenjavi informacij med gosti. Začetna stran `/` je kratek javni vhod v Ahoier; `/demo` je jasno označen lokalni interaktivni predogled, `/community` pa skupna Supabase skupnost, v kateri si prijavljen gost sam izbere plovbo. Ločeni `/pilot` še vedno omogoča preizkus srečanj v lokalni strežniški bazi.
 
 ## Lokalni družabni predogled (brez Supabase)
 
@@ -23,9 +23,9 @@ Podatki **lokalne predogledne skupnosti** se hranijo pod `ahoier:community:v1` v
 
 ## Skupnost s Supabase
 
-Ko nastaviš `NEXT_PUBLIC_SUPABASE_URL` in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ter izvedeš SQL migracijo, se odpre `/community`: prijava z e-poštnim povezovalnim sporočilom, prikazno ime, vstop v potovanje s povabilom, objave, odgovori in prijava neprimerne vsebine. Začetna stran `/` vodi v to skupnost; vzorčne osebe ostanejo izključno na `/demo`. Objave so vidne samo prijavljenim članom iste povabljene skupine. Koda ne potrjuje rezervacije ali identitete. Srečanja ostanejo v ločenem `/pilot`, Ahoi Dates pa lokalni zasebni predogled. Lokalnih profilov in objav ne prenašamo samodejno v Supabase.
+Ko nastaviš `NEXT_PUBLIC_SUPABASE_URL` in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ter izvedeš obe SQL migraciji, se odpre `/community`: prijava s povezavo po e-pošti, prikazno ime, izbor razpoložljive plovbe brez kode, objave, odgovori in prijava neprimerne vsebine. Začetna stran `/` vodi v to skupnost; vzorčne osebe ostanejo izključno na `/demo`. Vsak prijavljen uporabnik s profilom se lahko pridruži katerikoli plovbi, ki jo je ustvaril upravljavec. Objave so vidne članom iste plovbe, članstvo pa ni dokaz rezervacije, identitete ali prisotnosti na ladji. Srečanja ostanejo v ločenem `/pilot`, Ahoi Dates pa lokalni zasebni predogled. Lokalnih profilov in objav ne prenašamo samodejno v Supabase.
 
-Navodila za nastavitev projekta, varnostnih pravil in povabil so v [docs/SUPABASE.md](docs/SUPABASE.md). V `.env.local` sodita samo **Project URL** in **publishable key**; skrivnega ključa ne dodajaj v aplikacijo ali Git.
+Navodila za nastavitev projekta, varnostnih pravil in plovb so v [docs/SUPABASE.md](docs/SUPABASE.md). V `.env.local` sodita samo **Project URL** in **publishable key**; skrivnega ključa ne dodajaj v aplikacijo ali Git. Kode v ločenem pilotu `/pilot` ostanejo del njegovega lastnega sistema.
 
 ## Povabljeni pilot
 
@@ -87,7 +87,7 @@ npm run build
 
 ## Naslednja faza: prava skupnost
 
-Pred javno uporabo preveri produkcijsko gostovanje in konfiguracijo Supabase, postopek osveževanja itinerarjev, pravne vsebine ter pravice za fotografije in znamke. Supabase povabilo omeji dostop do potovalne skupine, ne preveri pa rezervacije ali identitete; odziv na prijave vsebin je še vedno treba organizirati. Ločeni pilot srečanj nima samopostrežne obnove računa, stalne moderacijske ekipe ali infrastrukture za več strežnikov. Za širšo produkcijsko skupnost potrebujemo preverjanje članstva, zanesljivo moderiranje, zasebnost in operativno podporo.
+Pred javno uporabo preveri produkcijsko gostovanje in konfiguracijo Supabase, postopek osveževanja itinerarjev, pravne vsebine ter pravice za fotografije in znamke. Skupnosti posameznih plovb so odprte za vse prijavljene uporabnike, zato izbor plovbe ne preverja rezervacije ali identitete; odziv na prijave vsebin je še vedno treba organizirati. Samo odstranitev članstva uporabnika ne izključi trajno, saj se lahko znova pridruži; za učinkovito omejevanje zlorab je potreben ločen postopek blokiranja. Ločeni pilot srečanj nima samopostrežne obnove računa, stalne moderacijske ekipe ali infrastrukture za več strežnikov. Za širšo produkcijsko skupnost potrebujemo zanesljivo moderiranje, zasebnost in operativno podporo.
 
 Pred javno skupnostjo potrebujemo tudi natančnejši ladijski čas za celotno pot, pravila za pretekle objave ter vir uradnega programa na ladji. Ura srečanja je vnos gostitelja, ne potrjen uradni čas. Zasebni stiki, javni imenik gostov, otroški profili in rezervacije še niso vključeni. Družinska prijava hrani samo število mest pri odraslem gostu, ne imen ali starosti otrok; v pilotu zasedbo preverja strežnik, v lokalnem predogledu pa ostane v brskalniku.
 
