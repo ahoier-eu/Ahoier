@@ -27,6 +27,8 @@ Posnetki predogleda: [mobilna stena](docs/screenshots/ahoier-social-wall-mobile.
 
 Ko nastaviš `NEXT_PUBLIC_SUPABASE_URL` in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` ter izvedeš **vse tri** SQL migracije, se odpre `/community`: prijava s povezavo po e-pošti, lastna potrditev 18+, izbor plovbe, družabna stena s fotografijami in emoji odzivi, 24-urne Stories, imenik članov, prijateljstva ter zasebna sporočila med potrjenimi prijatelji. Profilna fotografija je neobvezna. Prijavljeno vsebino lahko moderator pregleda na `/community/moderation`. Vzorčne osebe ostanejo izključno na `/demo`. Vsak prijavljen odrasel uporabnik se lahko pridruži katerikoli plovbi, ki jo je ustvaril upravljavec; izbor **ni dokaz** rezervacije, identitete ali prisotnosti na ladji. Srečanja ostanejo v ločenem `/pilot`, Ahoi Dates pa lokalni zasebni predogled. Lokalnih profilov in objav ne prenašamo samodejno v Supabase.
 
+Mobilna zasnova `/community` in `/demo` sledi [odobrenemu mockupu](docs/mockups/ahoier-social/README.md): kratka naslovnica izbrane plovbe, vidni člani in Stories, strnjen vnos objave ter profil gosta s fotografijo, prijateljskim dejanjem in dejansko vsebino. Pravi profil trenutno ne hrani opisa ali interesov iz statičnega primera.
+
 Navodila za nastavitev projekta, varnostnih pravil, plovb, moderatorja, čiščenja fotografij in [objavo na Vercelu](docs/SUPABASE.md#6-objava-na-vercelu) so v [docs/SUPABASE.md](docs/SUPABASE.md). V `.env.local` sodita samo **Project URL** in **publishable key**; skrivnega ključa ne dodajaj v aplikacijo ali Git. Kode v ločenem pilotu `/pilot` ostanejo del njegovega lastnega sistema.
 
 ## Povabljeni pilot

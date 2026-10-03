@@ -1,5 +1,7 @@
 # Ahoier: mobilni družabni koncept
 
+Zasnova je zdaj prenesena v pravi `/community` in lokalni `/demo`. Ta mapa še vedno hrani statični referenčni predogled. Prava skupnost uporablja samo dejanske podatke iz Supabase; demo prikazuje jasno označene izmišljene primere. Opis in interesi vzorčnega profila še niso del pravega profila, ker ju trenutna shema ne hrani.
+
 Odpri [`index.html`](./index.html) v brskalniku. Prikazuje steno izbrane plovbe in profil gosta kot ločen vizualni predogled. Hitri pregled je v [`preview.png`](./preview.png), posamezna mobilna zaslona pa v [`wall.png`](./wall.png) in [`profile.png`](./profile.png). Vsi gostje, Stories in objave so izmišljeni; nobena vsebina ni povezana z dejansko skupnostjo ali Supabase. Zaslona sta statična.
 
 Na steni je naslovnica plovbe kratka, da so ljudje, Stories, obrazec in prva objava hitro vidni. Profil uporabi naslovnico plovbe kot privzeto ozadje, veliko profilno fotografijo in eno glavno dejanje. Prijateljstvo in zasebna sporočila sledijo obstoječemu pravilu, da je pogovor mogoč šele po sprejetju prošnje. Interesi in opis v profilu so predlog nadaljnje razširitve; trenutna produkcijska shema ju ne shranjuje. Stories ostanejo 24-urne, zato prikaz ni trajni »Highlights« arhiv.

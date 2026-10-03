@@ -8,6 +8,7 @@ import { dateLabel } from "@/lib/journey";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { LiveSocialWorkspace, type SocialProfile, type SocialVoyage } from "./live-social-workspace";
 import "./live-social.css";
+import "./live-social-concept.css";
 
 function voyageLabel(voyage: SocialVoyage) {
   return `${voyage.ship} · ${dateLabel(voyage.starts_on, { year: "numeric" })} – ${dateLabel(voyage.ends_on, { year: "numeric" })}`;

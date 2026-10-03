@@ -1,0 +1,147 @@
+/* The local preview follows the two-screen social mockup. Every sample remains labelled as fiction. */
+.social-app .demo-wall{max-width:1110px}
+.social-app .demo-wall-header{padding:0;margin:0 0 11px}
+.social-app .demo-voyage-cover,.social-app .demo-guest-cover{position:relative;overflow:hidden;background:#386c73;color:#fff}
+.social-app .demo-voyage-cover{height:205px;border-radius:21px}
+.social-app .demo-voyage-photo,.social-app .demo-guest-cover>img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 47%}
+.social-app .demo-voyage-cover:after,.social-app .demo-guest-cover:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#092f3bbf 0%,#103c4770 55%,#12384516 100%);pointer-events:none}
+.social-app .demo-voyage-cover-copy{position:absolute;z-index:1;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:19px 24px 22px}
+.social-app .demo-cover-kicker{display:inline-flex;align-items:center;gap:7px;width:max-content;max-width:100%;padding:5px 8px;border-radius:20px;background:#103b45b8;color:#fff;font-size:10px;line-height:1.2;font-weight:800;letter-spacing:.08em}
+.social-app .demo-voyage-cover h1{color:#fff;font-size:clamp(30px,3.7vw,46px);line-height:1.04;margin:0 0 3px;letter-spacing:-.04em}
+.social-app .demo-voyage-cover p{color:#fff;font-size:15px;line-height:1.25;margin:0}
+.social-app .demo-voyage-cover small{display:block;margin-top:6px;color:#e5f2ee;font-size:11px;font-weight:650}
+.social-app .demo-wall-people-link{display:flex;align-items:center;gap:13px;width:min(690px,100%);min-height:64px;margin:0 0 20px;padding:8px 12px;text-align:left;border:1px solid #deebe5;background:#fff;border-radius:15px;color:#214c4c;cursor:pointer}
+.social-app .demo-wall-people-link:hover{border-color:#91bdac;background:#f7fbf8}
+.social-app .demo-wall-people-link>span:nth-child(2){flex:1;min-width:0}
+.social-app .demo-wall-people-link strong,.social-app .demo-wall-people-link small{display:block}
+.social-app .demo-wall-people-link strong{font-size:13px;line-height:1.3}
+.social-app .demo-wall-people-link small{color:#6f8780;font-size:11px;line-height:1.3;margin-top:2px}
+.social-app .demo-wall-people-link>svg{flex:none;color:#28776c}
+.social-app .demo-wall-face-stack{display:flex;align-items:center;flex:none;padding-left:7px}
+.social-app .demo-wall-face-stack .social-avatar{width:35px;height:35px;margin-left:-7px;border:2px solid #fff;font-size:14px}
+.social-app .demo-wall-layout{grid-template-columns:minmax(0,690px) minmax(235px,1fr);gap:25px}
+.social-app .demo-stories{margin-bottom:14px}
+.social-app .demo-stories .demo-section-head{align-items:end;margin-bottom:10px}
+.social-app .demo-stories .demo-section-head h2,.social-app .demo-feed-head h2{font-size:21px;letter-spacing:-.025em}
+.social-app .demo-stories-row{gap:10px;padding:1px 0 7px}
+.social-app .demo-stories-row{scrollbar-width:none}
+.social-app .demo-stories-row::-webkit-scrollbar{display:none}
+.social-app .demo-story-card,.social-app .demo-story-add{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;flex:0 0 96px;width:96px;height:auto;min-height:0;padding:0;border:0;border-radius:0;background:transparent;color:#254b4b;text-align:center;overflow:visible}
+.social-app .demo-story-card .demo-story-image,.social-app .demo-story-add .demo-story-image{display:block;position:relative;width:96px;height:95px;border-radius:15px;overflow:hidden;background:#dbe9df;border:2px solid #e8aa88}
+.social-app .demo-story-card .demo-story-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.social-app .demo-story-add .demo-story-image{display:grid;place-items:center;border:1px dashed #8cb7a7;background:#e5f1e8;color:#137668}
+.social-app .demo-story-add .demo-story-image>.social-avatar{width:51px;height:51px;font-size:21px}
+.social-app .demo-story-plus{position:absolute;right:17px;bottom:9px;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#fff;color:#137668;box-shadow:0 1px 5px #17382b35}
+.social-app .demo-story-card>strong,.social-app .demo-story-add>strong{display:block;width:100%;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;line-height:1.2;color:#254b4b}
+.social-app .demo-story-card>small,.social-app .demo-story-add>small{display:block;position:static;width:100%;margin-top:2px;color:#90765f;font-size:9px;line-height:1.2}
+.social-app .demo-wall-composer{margin:5px 0 0;padding:9px 11px;border-radius:15px;box-shadow:0 3px 10px #24413e08}
+.social-app .demo-wall-composer>button:nth-child(2){min-height:38px;border:0;background:transparent;border-radius:0;padding:5px 2px;font-size:12px}
+.social-app .demo-feed-head{margin:19px 0 9px}
+.social-app .demo-wall-post{padding:15px!important;border-radius:17px;box-shadow:0 3px 12px #173e3b09}
+.social-app .demo-wall-post .social-card-top{flex-wrap:nowrap;align-items:flex-start;gap:8px}
+.social-app .demo-wall-post .demo-post-badges{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap}
+.social-app .demo-wall-post .social-category{white-space:nowrap;font-size:9px;font-weight:800;letter-spacing:.03em}
+.social-app .demo-wall-post .demo-post-badges .demo-pill{font-size:8px}
+.social-app .demo-wall-post .post-author .social-avatar{width:37px;height:37px}
+.social-app .demo-wall-post .post-body{font-size:13px!important;line-height:1.55!important;margin:0 0 10px}
+.social-app .demo-example-photo img{height:240px}
+.social-app .demo-example-photo small{font-size:10px}
+.social-app .demo-wall-post .post-tools{margin-top:8px;padding-top:8px}
+.social-app .demo-wall-post .demo-reaction-area{padding-top:8px}
+.social-app .demo-wall-post .demo-reactions button{min-height:31px;padding:3px 8px}
+.social-app .demo-wall-post .post-replies{margin-top:8px}
+.social-app .demo-wall-post .post-replies summary{font-weight:650}
+.social-app .demo-person-card{align-items:flex-start}
+.social-app .demo-person-card>.demo-avatar-large{width:62px;height:62px;flex:none}
+.social-app .demo-view-profile{display:inline-flex;align-items:center;gap:5px;margin-top:11px;padding:7px 0;border:0;background:transparent;color:#177a70;font-size:12px;font-weight:750;cursor:pointer}
+.social-app .demo-view-profile:hover{text-decoration:underline}
+.social-app .demo-guest-profile,.social-app .demo-self-profile-head{width:min(720px,100%);margin:0 auto}
+.social-app .demo-guest-topline{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px;margin-bottom:8px;color:#70847e;font-size:12px;font-weight:700}
+.social-app .demo-guest-back{display:inline-flex;align-items:center;gap:4px;min-height:35px;padding:5px 2px;border:0;background:transparent;color:#15766d;font-size:12px;font-weight:800;cursor:pointer}
+.social-app .demo-guest-cover{height:190px;border-radius:20px}
+.social-app .demo-guest-cover:after{background:linear-gradient(180deg,transparent 30%,#0e46477a)}
+.social-app .demo-guest-cover>span{position:absolute;z-index:1;top:12px;left:13px;padding:5px 8px;border-radius:20px;background:#123e47b9;font-size:10px;font-weight:750}
+.social-app .demo-guest-identity{position:relative;z-index:1;margin:-52px 14px 0;padding:0 15px 17px;text-align:center;border-bottom:1px solid #dfeae5}
+.social-app .demo-guest-identity>.demo-avatar-large{display:grid;place-items:center;width:102px;height:102px;margin:0 auto 6px;border:5px solid #fff;border-radius:50%;font-size:39px;box-shadow:0 3px 15px #13413f26}
+.social-app .demo-guest-identity h1{font-size:clamp(25px,3vw,32px);line-height:1.05;letter-spacing:-.035em;margin:0}
+.social-app .demo-guest-identity>p{margin:5px 0 7px;color:#738980;font-size:12px}
+.social-app .demo-guest-identity>.demo-pill{display:inline-block;margin-bottom:12px;background:#fff0e4;color:#9d603d;font-size:9px}
+.social-app .demo-guest-identity .demo-person-actions{display:flex;justify-content:center;gap:8px;margin:0 auto;max-width:440px}
+.social-app .demo-guest-identity .demo-person-actions>.primary-button{flex:1;justify-content:center;min-height:43px;font-size:12px}
+.social-app .demo-guest-identity .demo-person-actions>.demo-block-link{font-size:11px;white-space:nowrap}
+.social-app .demo-guest-identity .demo-person-note{display:block;margin-top:8px;color:#788c84;font-size:10px;line-height:1.45}
+.social-app .demo-guest-about{margin:14px 0 0;padding:17px 18px;border:1px solid #dfeae5;border-radius:16px;background:#fff}
+.social-app .demo-guest-about h2{font-size:17px;line-height:1.2;margin:0 0 6px}
+.social-app .demo-guest-about p{font-size:13px;line-height:1.6;color:#4d6c67;margin:0}
+.social-app .demo-guest-about .demo-person-interests{margin-top:11px}
+.social-app .demo-guest-about>small{display:block;margin-top:12px;color:#7a9087;font-size:10px}
+.social-app .demo-guest-moments{margin-top:18px}
+.social-app .demo-guest-moment-row{display:flex;gap:9px;overflow-x:auto;padding-bottom:5px}
+.social-app .demo-guest-moment-row button{position:relative;flex:0 0 126px;width:126px;height:140px;padding:0;border:0;border-radius:13px;overflow:hidden;background:#c7dfd5;color:#fff;text-align:left;cursor:pointer}
+.social-app .demo-guest-moment-row img{width:100%;height:100%;object-fit:cover}
+.social-app .demo-guest-moment-row button:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#0a383eb8);pointer-events:none}
+.social-app .demo-guest-moment-row span{position:absolute;z-index:1;left:8px;right:7px;bottom:8px;display:-webkit-box;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:10px;line-height:1.3;font-weight:750}
+.social-app .demo-guest-profile>.demo-people-disclaimer{max-width:600px;margin:18px auto;color:#738980;font-size:11px;line-height:1.5}
+.social-app .demo-self-profile-head{margin-bottom:23px}
+.social-app .demo-self-profile-head .demo-guest-identity{padding-bottom:14px}
+.social-app .demo-profile-edit-head{max-width:1120px;margin:0 auto 16px}
+.social-app .demo-profile-edit-head h2{font-size:23px;margin:4px 0}
+.social-app .demo-profile-edit-head p{color:#607b76;font-size:12px;line-height:1.55}
+.social-app .demo-profile-photo{margin:0 0 14px;padding:4px 0 12px;border-bottom:1px solid #e7eeea}
+.social-app .demo-profile-photo label{font-weight:750}
+.social-app .demo-profile-photo:focus-within label{outline:3px solid #e88758;outline-offset:3px;border-radius:4px}
+@media(max-width:1050px){.social-app .demo-wall-layout{grid-template-columns:minmax(0,1fr)}.social-app .demo-wall-side{position:static}}
+@media(max-width:680px){
+  .social-app .social-topbar{height:61px;padding:0 17px}
+  .social-app .social-mobile-brand{font-size:27px}
+  .social-app .social-topbar .trip-switch{min-width:0;padding:6px 9px;gap:5px}
+  .social-app .social-topbar .trip-switch small{display:none}
+  .social-app .social-live-banner{min-height:45px;padding:8px 10px;margin-bottom:7px}
+  .social-app .social-live-banner>div{min-width:0;flex:1}
+  .social-app .social-live-banner strong{font-size:13px}
+  .social-app .social-live-banner>a{min-width:0;min-height:31px;flex:none;padding:6px 8px;font-size:10px}
+  .social-app .prototype-banner{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;min-height:0;margin-bottom:7px;padding:6px 8px}
+  .social-app .prototype-banner>.demo-pill{font-size:8px;padding:4px 6px}
+  .social-app .prototype-mobile-note{min-width:0;font-size:10px}
+  .social-app .prototype-mobile-note summary{display:block;min-height:0;padding:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .social-app .prototype-mobile-note p{grid-column:1/-1}
+  .social-app .prototype-pilot-link{position:static;transform:none;white-space:nowrap;font-size:9px}
+  .social-app .prototype-pilot-link svg{display:none}
+  .social-app .demo-wall-header{margin-bottom:0}
+  .social-app .demo-voyage-cover{height:143px;margin:0 -17px;border-radius:0}
+  .social-app .demo-voyage-cover-copy{padding:13px 17px 15px}
+  .social-app .demo-cover-kicker{font-size:9px}
+  .social-app .demo-voyage-cover h1{font-size:29px}
+  .social-app .demo-voyage-cover p{font-size:12px}
+  .social-app .demo-voyage-cover small{font-size:10px;margin-top:3px}
+  .social-app .demo-wall-people-link{min-height:53px;margin:7px 0 11px;padding:6px 8px;border-radius:10px}
+  .social-app .demo-wall-people-link strong{font-size:11px}
+  .social-app .demo-wall-people-link small{font-size:10px}
+  .social-app .demo-wall-face-stack .social-avatar{width:29px;height:29px;font-size:11px}
+  .social-app .demo-stories .demo-section-head h2,.social-app .demo-feed-head h2{font-size:19px}
+  .social-app .demo-stories .demo-section-head .eyebrow{display:none}
+  .social-app .demo-stories .demo-section-head .demo-pill{font-size:8px}
+  .social-app .demo-story-card,.social-app .demo-story-add{flex-basis:78px;width:78px}
+  .social-app .demo-story-card .demo-story-image,.social-app .demo-story-add .demo-story-image{width:78px;height:75px;border-radius:12px}
+  .social-app .demo-story-add .demo-story-image>.social-avatar{width:43px;height:43px;font-size:18px}
+  .social-app .demo-story-plus{right:10px;bottom:6px}
+  .social-app .demo-story-card>strong,.social-app .demo-story-add>strong{font-size:10px}
+  .social-app .demo-story-card>small,.social-app .demo-story-add>small{font-size:8px}
+  .social-app .demo-wall-composer{padding:7px 9px;gap:7px}
+  .social-app .demo-wall-composer>button:nth-child(2){font-size:11px}
+  .social-app .demo-feed-head{margin:15px 0 8px}
+  .social-app .demo-wall-post{padding:12px!important}
+  .social-app .demo-wall-post .post-body{font-size:12px!important}
+  .social-app .demo-example-photo img{height:178px}
+  .social-app .demo-guest-profile,.social-app .demo-self-profile-head{width:100%}
+  .social-app .demo-guest-cover{height:157px;margin:0 -17px;border-radius:0}
+  .social-app .demo-guest-identity{margin-top:-47px}
+  .social-app .demo-guest-identity>.demo-avatar-large{width:96px;height:96px}
+  .social-app .demo-guest-identity h1{font-size:25px}
+  .social-app .demo-guest-about{padding:13px}
+  .social-app .demo-guest-about h2{font-size:15px}
+  .social-app .demo-guest-about p{font-size:11px}
+  .social-app .demo-guest-moment-row button{flex-basis:104px;width:104px;height:114px}
+  .social-app .demo-profile-edit-head h2{font-size:21px}
+}
+@media(max-width:370px){.social-app .demo-wall-people-link small{font-size:9px}.social-app .demo-stories .demo-section-head .demo-pill{display:none}.social-app .demo-guest-identity .demo-person-actions{flex-direction:column}}
