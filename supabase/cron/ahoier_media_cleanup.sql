@@ -15,7 +15,8 @@ select cron.schedule(
       'Content-Type', 'application/json',
       'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'ahoier_cleanup_secret_key')
     ),
-    body := '{}'::jsonb
+    body := '{}'::jsonb,
+    timeout_milliseconds := 60000
   );
   $$
 );
