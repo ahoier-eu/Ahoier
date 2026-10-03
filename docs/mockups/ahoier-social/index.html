@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ahoier · Social UI concept</title>
+  <style>
+    @font-face { font-family: Bricolage; src: url("../../../public/fonts/bricolage-grotesque.ttf") format("truetype"); font-display: swap; }
+    @font-face { font-family: Jakarta; src: url("../../../public/fonts/plus-jakarta-sans.ttf") format("truetype"); font-display: swap; }
+    :root { --ink: #173d40; --muted: #748580; --teal: #167e76; --peach: #ef9c77; --paper: #f5f7f4; --line: #e3eae5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #e9efeb; color: var(--ink); font-family: Jakarta, Arial, sans-serif; }
+    button { font: inherit; cursor: default; }
+    svg.icon { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    .stage { min-height: 100vh; padding: 35px 40px 25px; overflow: hidden; position: relative; }
+    .stage::before { content: ""; position: absolute; width: 580px; height: 580px; border-radius: 50%; background: #cde7db; filter: blur(10px); left: -290px; top: -235px; opacity: .75; }
+    .stage::after { content: ""; position: absolute; width: 430px; height: 430px; border-radius: 50%; background: #f9ddd0; right: -250px; bottom: -240px; opacity: .8; }
+    .stage-inner { position: relative; z-index: 1; max-width: 1200px; margin: auto; }
+    .intro { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin: 0 0 25px; }
+    .intro-copy { max-width: 620px; }
+    .intro-kicker { display: flex; align-items: center; gap: 9px; font-size: 11px; letter-spacing: .18em; font-weight: 800; color: #4a7c72; text-transform: uppercase; margin: 0 0 9px; }
+    .intro-kicker i { width: 8px; height: 8px; border-radius: 50%; background: var(--peach); }
+    .intro h1 { font: 800 clamp(30px, 3.5vw, 48px)/.99 Bricolage, Arial, sans-serif; letter-spacing: -.045em; margin: 0; }
+    .intro h1 em { color: var(--teal); font-style: normal; }
+    .intro p:last-child { margin: 10px 0 0; color: #5f7873; font-size: 13px; line-height: 1.55; }
+    .intro-brand { font: 800 34px/1 Bricolage, Arial, sans-serif; letter-spacing: -.055em; white-space: nowrap; padding-bottom: 4px; }
+    .intro-brand span { color: var(--peach); }
+    .showcase { display: flex; justify-content: center; align-items: start; gap: clamp(34px, 8vw, 108px); }
+    figure { margin: 0; }
+    figcaption { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin: 16px 10px 0; color: #446a65; font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    figcaption span:last-child { color: #80958d; font-weight: 600; text-transform: none; letter-spacing: 0; }
+    .phone { width: 390px; height: 812px; background: var(--paper); border: 10px solid #1e2b2b; border-radius: 49px; box-shadow: 0 5px 0 #0d1717, 0 20px 55px #26494230; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+    .phone::before { content: ""; width: 105px; height: 20px; border-radius: 0 0 14px 14px; background: #1e2b2b; position: absolute; left: calc(50% - 52.5px); top: 0; z-index: 10; }
+    .status { height: 26px; flex: none; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; font-size: 10px; font-weight: 800; color: #1e2b2b; }
+    .status-right { display: flex; align-items: center; gap: 5px; font-size: 10px; }
+    .signal { font-size: 9px; letter-spacing: -2px; margin-right: 3px; }
+    .battery { width: 17px; height: 9px; border: 1.6px solid currentColor; border-radius: 2px; position: relative; }
+    .battery::before { content: ""; position: absolute; inset: 1px 2px 1px 1px; background: currentColor; border-radius: 1px; }
+    .battery::after { content: ""; position: absolute; right: -4px; top: 2px; width: 2px; height: 3px; background: currentColor; border-radius: 0 2px 2px 0; }
+    .appbar { flex: none; height: 51px; background: #fff; border-bottom: 1px solid var(--line); padding: 0 17px; display: flex; align-items: center; justify-content: space-between; }
+    .appbar .wordmark { font: 800 28px/1 Bricolage, Arial, sans-serif; letter-spacing: -.055em; }
+    .appbar .wordmark span { color: var(--peach); }
+    .appbar-actions { display: flex; align-items: center; gap: 10px; }
+    .concept-pill { font-size: 9px; font-weight: 800; letter-spacing: .05em; background: #fff1e6; color: #a45a36; border-radius: 30px; padding: 6px 8px; }
+    .app-icon { border: 0; background: #edf4ef; color: var(--teal); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; padding: 0; }
+    .app-icon .icon { width: 16px; height: 16px; }
+    .scroll { flex: 1; min-height: 0; overflow: auto; scrollbar-width: none; }
+    .scroll::-webkit-scrollbar { display: none; }
+    .bottom-nav { height: 68px; flex: none; display: grid; grid-template-columns: repeat(4, 1fr); align-items: stretch; background: #fff; border-top: 1px solid #e1e9e5; box-shadow: 0 -4px 18px #173d4010; }
+    .bottom-nav button { position: relative; border: 0; background: transparent; color: #899b94; display: grid; justify-items: center; align-content: center; gap: 2px; padding: 5px 0; font-size: 10px; font-weight: 600; }
+    .bottom-nav button.active { color: var(--teal); font-weight: 800; }
+    .bottom-nav button.active::before { content: ""; width: 27px; height: 3px; border-radius: 0 0 4px 4px; background: var(--teal); position: absolute; top: 0; left: calc(50% - 13.5px); }
+    .bottom-nav .icon { width: 21px; height: 21px; }
+    .voyage-cover { height: 155px; margin: 13px 13px 0; border-radius: 20px; overflow: hidden; position: relative; background: #579598; color: #fff; }
+    .voyage-cover img, .profile-cover img { width: 100%; height: 100%; object-fit: cover; object-position: center 53%; display: block; }
+    .voyage-cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #062f3d18 17%, #062f3dcc 100%); }
+    .voyage-cover-content { position: absolute; z-index: 1; inset: 0; padding: 11px 16px 14px; display: flex; flex-direction: column; justify-content: space-between; }
+    .cover-label { align-self: start; border: 1px solid #ffffff99; background: #092d3499; border-radius: 20px; padding: 5px 8px; font-size: 9px; letter-spacing: .07em; font-weight: 800; }
+    .voyage-cover h2 { margin: 0; font: 800 29px/.95 Bricolage, Arial, sans-serif; letter-spacing: -.03em; }
+    .voyage-cover p { margin: 3px 0 0; color: #e8f7ef; font-size: 11px; font-weight: 650; }
+    .people-link { display: flex; align-items: center; gap: 10px; width: calc(100% - 26px); margin: 6px 13px 2px; border: 0; border-bottom: 1px solid #e0e9e3; background: transparent; text-align: left; padding: 8px 1px 10px; }
+    .face-stack { display: flex; padding-left: 4px; flex: none; }
+    .face-stack .face { margin-left: -5px; border: 2px solid var(--paper); }
+    .face { width: 30px; height: 30px; border-radius: 50%; background: #d8ece2; display: grid; place-items: center; color: #1b776d; font-size: 11px; font-weight: 850; overflow: hidden; flex: none; }
+    .face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .face.peach { background: #f5d1bc; color: #96593d; }
+    .face.cream { background: #f1e5c9; color: #7e6c36; }
+    .people-link strong { display: block; font-size: 11px; font-weight: 800; }
+    .people-link small { display: block; color: var(--muted); font-size: 10px; margin-top: 1px; }
+    .people-link>.icon { color: var(--teal); margin-left: auto; width: 15px; height: 15px; }
+    .small-section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 13px 14px 8px; }
+    .small-section-title h3 { margin: 0; font: 800 17px/1.1 Bricolage, Arial, sans-serif; letter-spacing: -.03em; }
+    .small-section-title span { font-size: 9px; color: #a66b43; font-weight: 800; letter-spacing: .04em; }
+    .stories { display: flex; gap: 9px; overflow: hidden; padding: 0 13px 3px; }
+    .story { min-width: 76px; width: 76px; }
+    .story-photo { height: 72px; overflow: hidden; position: relative; background: #d4e7db; border-radius: 13px; border: 2px solid #e5ab87; }
+    .story-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .story.add .story-photo { display: grid; place-items: center; background: #e3f1e9; color: var(--teal); border: 1px dashed #99c4b4; }
+    .story.add .icon { width: 22px; height: 22px; }
+    .story strong { display: block; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; margin-top: 4px; text-align: center; }
+    .composer { margin: 11px 13px 0; padding: 9px 10px; display: flex; align-items: center; gap: 8px; border: 1px solid #e0e9e3; border-radius: 16px; background: #fff; box-shadow: 0 3px 9px #24413e08; }
+    .composer .face { width: 32px; height: 32px; flex: none; }
+    .composer>span:nth-child(2) { color: #768b82; font-size: 11px; flex: 1; }
+    .composer .icon { color: var(--teal); }
+    .feed-heading { display: flex; justify-content: space-between; align-items: center; margin: 15px 14px 8px; }
+    .feed-heading h3 { margin: 0; font: 800 19px/1 Bricolage, Arial, sans-serif; letter-spacing: -.03em; }
+    .feed-heading small { color: var(--teal); font-size: 10px; font-weight: 800; }
+    .post { margin: 0 13px 17px; border: 1px solid #e0e9e3; background: #fff; border-radius: 17px; padding: 12px; overflow: hidden; }
+    .post-author { display: flex; gap: 8px; align-items: center; }
+    .post-author .face { width: 35px; height: 35px; }
+    .post-author strong { display: block; font-size: 12px; line-height: 1.25; }
+    .post-author small { display: block; color: #87958f; font-size: 9px; margin-top: 2px; }
+    .post-demo { margin-left: auto; align-self: start; border-radius: 12px; background: #fff2e7; color: #a7613a; padding: 4px 6px; font-size: 8px; font-weight: 850; letter-spacing: .03em; }
+    .post p { margin: 10px 0; font-size: 12px; line-height: 1.5; color: #314c4a; }
+    .post-image { width: 100%; height: 155px; display: block; object-fit: cover; object-position: center 51%; border-radius: 10px; }
+    .post-actions { display: flex; gap: 18px; align-items: center; border-top: 1px solid #edf0ec; margin-top: 10px; padding-top: 8px; color: #59756d; font-size: 10px; font-weight: 750; }
+    .post-actions span { display: flex; align-items: center; gap: 4px; }
+    .post-actions .icon { width: 15px; height: 15px; }
+    .profile-appbar { justify-content: space-between; }
+    .back-link { display: flex; align-items: center; gap: 3px; font-weight: 800; color: var(--teal); font-size: 11px; }
+    .back-link .icon { width: 17px; height: 17px; }
+    .profile-appbar strong { font: 800 15px Bricolage, Arial, sans-serif; }
+    .profile-cover { height: 154px; position: relative; background: #9dc2bf; }
+    .profile-cover img { object-position: center 45%; }
+    .profile-cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, #0e46477a); }
+    .profile-heading { position: relative; margin: -48px 13px 0; padding: 0 11px 12px; border-bottom: 1px solid #e3ebe5; text-align: center; }
+    .large-face { display: block; width: 93px; height: 93px; margin: 0 auto 5px; border: 5px solid #fff; border-radius: 50%; object-fit: cover; box-shadow: 0 3px 12px #13413f1a; position: relative; }
+    .profile-heading h2 { margin: 0; font: 800 25px/1.05 Bricolage, Arial, sans-serif; letter-spacing: -.035em; }
+    .profile-heading .subline { color: var(--muted); font-size: 11px; margin: 4px 0 0; }
+    .profile-heading .demo-line { display: inline-block; color: #9d603d; background: #fff0e4; border-radius: 12px; padding: 4px 7px; font-size: 9px; font-weight: 800; margin: 7px 0 9px; }
+    .profile-actions { display: flex; gap: 7px; }
+    .profile-actions button { border: 0; min-height: 37px; border-radius: 9px; font-size: 11px; font-weight: 800; }
+    .profile-actions button.primary { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--teal); color: #fff; flex: 1; }
+    .profile-actions button.primary .icon { width: 15px; height: 15px; }
+    .profile-actions button.more { width: 38px; background: #e8f1eb; color: var(--teal); font-size: 19px; line-height: 1; }
+    .profile-heading .message-note { color: #81928b; font-size: 9px; margin: 7px 0 0; }
+    .profile-card { margin: 12px 13px 0; padding: 12px 13px; border: 1px solid #e0e9e3; border-radius: 15px; background: #fff; }
+    .profile-card h3 { font: 800 14px/1.1 Bricolage, Arial, sans-serif; margin: 0 0 5px; }
+    .profile-card p { margin: 0; color: #547069; font-size: 11px; line-height: 1.5; }
+    .interest-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+    .interest-tags span { background: #e8f2eb; color: #26786b; padding: 5px 7px; border-radius: 13px; font-size: 9px; font-weight: 750; }
+    .profile-moments { display: flex; gap: 8px; padding: 0 13px; }
+    .moment-tile { width: 100px; flex: none; height: 108px; border-radius: 12px; overflow: hidden; position: relative; background: #c3ded3; }
+    .moment-tile img { width: 100%; height: 100%; object-fit: cover; }
+    .moment-tile::after { content: ""; position: absolute; inset: 50% 0 0; background: linear-gradient(transparent, #0a383eb8); }
+    .moment-tile span { position: absolute; z-index: 1; left: 7px; bottom: 7px; color: #fff; font-size: 10px; font-weight: 800; }
+    .booking-note { margin: 13px 17px 17px; color: #84968d; font-size: 9px; line-height: 1.4; }
+    .credits { display: flex; justify-content: space-between; gap: 20px; margin-top: 21px; color: #6b847b; font-size: 11px; line-height: 1.45; }
+    .credits a { color: #306f66; }
+    @media (max-width: 900px) { .stage { padding: 25px 12px; } .intro { max-width: 390px; margin: 0 auto 24px; } .intro-brand { display: none; } .showcase { flex-direction: column; align-items: center; gap: 37px; } .phone { width: min(390px, calc(100vw - 26px)); } .credits { display: block; max-width: 390px; margin: 25px auto 0; } }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute;overflow:hidden">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2"/><path d="M16 5a3 3 0 0 1 0 6M17 15a5 5 0 0 1 4 5"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 15a7 7 0 0 1-7 7H4l2-4a8 8 0 1 1 14-3Z"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="14" r="3"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 8.5C20.8 14.4 12 21 12 21S3.2 14.4 3.2 8.5a4.8 4.8 0 0 1 8.8-2.6 4.8 4.8 0 0 1 8.8 2.6Z"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8ZM10 20h4"/></symbol>
+    <symbol id="i-person-add" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M18 8v8m-4-4h8"/></symbol>
+  </svg>
+  <main class="stage">
+    <div class="stage-inner">
+      <header class="intro">
+        <div class="intro-copy"><p class="intro-kicker"><i></i> AHOIER / MOBILNI KONCEPT</p><h1>Več ljudi. <em>Več življenja na ladji.</em></h1><p>Dva predloga zaslona: stena izbrane plovbe in profil gosta. Vsi prikazani gostje ter objave so izmišljeni.</p></div>
+        <div class="intro-brand" aria-label="ahoier">ahoier<span>.</span></div>
+      </header>
+      <div class="showcase">
+        <figure>
+          <div class="phone" aria-label="Koncept mobilne stene plovbe">
+            <div class="status"><span>9:41</span><span class="status-right"><span class="signal">▂▄▆</span>◕ <i class="battery"></i></span></div>
+            <div class="appbar"><span class="wordmark">ahoier<span>.</span></span><div class="appbar-actions"><span class="concept-pill">KONZEPT</span><button class="app-icon" aria-label="Obvestila"><svg class="icon"><use href="#i-bell"/></svg></button></div></div>
+            <div class="scroll">
+              <section class="voyage-cover"><img src="../../../public/ships/aidacosma.jpg" alt="AIDAcosma"><div class="voyage-cover-content"><span class="cover-label">DEINE REISEGRUPPE</span><div><h2>AIDAcosma</h2><p>Deine Reise. Deine Leute.</p></div></div></section>
+              <button class="people-link"><span class="face-stack"><span class="face"><img src="assets/mara-portrait.webp" alt=""></span><span class="face peach">J</span><span class="face cream">L</span></span><span><strong>Menschen an Bord entdecken</strong><small>Beispielprofile · keine echten Gäste</small></span><svg class="icon"><use href="#i-right"/></svg></button>
+              <div class="small-section-title"><h3>Momente an Bord</h3><span>BEISPIEL-STORIES</span></div>
+              <div class="stories">
+                <div class="story add"><div class="story-photo"><svg class="icon"><use href="#i-plus"/></svg></div><strong>Dein Moment</strong></div>
+                <div class="story"><div class="story-photo"><img src="assets/mara-portrait.webp" alt="Fiktive Person"></div><strong>Mara</strong></div>
+                <div class="story"><div class="story-photo"><img src="../../../public/ships/aidacosma.jpg" alt="AIDAcosma"></div><strong>An Deck</strong></div>
+                <div class="story"><div class="story-photo"><img src="assets/friends-coffee.webp" alt="Fiktive Gäste bei Kaffee"></div><strong>Kaffee</strong></div>
+              </div>
+              <div class="composer"><span class="face peach">D</span><span>Was möchtest du teilen?</span><svg class="icon"><use href="#i-camera"/></svg></div>
+              <div class="feed-heading"><h3>Die Pinnwand</h3><small>Neueste Beiträge</small></div>
+              <article class="post"><div class="post-author"><span class="face"><img src="assets/mara-portrait.webp" alt=""></span><div><strong>Mara Becker</strong><small>Beispielbeitrag · AIDAcosma</small></div><span class="post-demo">ERFUNDEN</span></div><p>Ein Kaffeemoment mit neuen Gesichtern an Bord ☕ Was war bisher euer schönster Moment?</p><img class="post-image" src="assets/friends-coffee.webp" alt="Fiktive erwachsene Gäste an Bord"><div class="post-actions"><span><svg class="icon"><use href="#i-heart"/></svg> Reagieren</span><span><svg class="icon"><use href="#i-chat"/></svg> Antworten</span></div></article>
+            </div>
+            <nav class="bottom-nav" aria-label="Konzept Navigation"><button class="active"><svg class="icon"><use href="#i-home"/></svg>Pinnwand</button><button><svg class="icon"><use href="#i-users"/></svg>Leute</button><button><svg class="icon"><use href="#i-chat"/></svg>Nachrichten</button><button><svg class="icon"><use href="#i-user"/></svg>Profil</button></nav>
+          </div>
+          <figcaption><span>01 / STENA PLOVBE</span><span>Ljudje, zgodbe, objave</span></figcaption>
+        </figure>
+        <figure>
+          <div class="phone" aria-label="Koncept mobilnega profila gosta">
+            <div class="status"><span>9:41</span><span class="status-right"><span class="signal">▂▄▆</span>◕ <i class="battery"></i></span></div>
+            <div class="appbar profile-appbar"><span class="back-link"><svg class="icon"><use href="#i-left"/></svg> Leute</span><strong>Gastprofil</strong><span class="concept-pill">KONZEPT</span></div>
+            <div class="scroll">
+              <div class="profile-cover"><img src="../../../public/ships/aidacosma.jpg" alt="AIDAcosma"></div>
+              <section class="profile-heading"><img class="large-face" src="assets/mara-portrait.webp" alt="Fiktives Profilfoto von Mara"><h2>Mara Becker</h2><p class="subline">Teil deiner AIDAcosma-Reisegruppe</p><span class="demo-line">BEISPIELPROFIL · ERFUNDEN</span><div class="profile-actions"><button class="primary"><svg class="icon"><use href="#i-person-add"/></svg> Freundschaft anfragen</button><button class="more" aria-label="Weitere Optionen">···</button></div><p class="message-note">Private Nachrichten nach bestätigter Freundschaft.</p></section>
+              <section class="profile-card"><h3>Ahoi, ich bin Mara.</h3><p>Ich mag gute Gespräche, Kaffee mit Meerblick und kleine Entdeckungen auf Reisen.</p><div class="interest-tags"><span>Kaffee</span><span>Gemeinsame Ausflüge</span><span>Fotografie</span></div></section>
+              <div class="small-section-title"><h3>Momente</h3><span>24 STUNDEN SICHTBAR</span></div>
+              <div class="profile-moments"><div class="moment-tile"><img src="assets/friends-coffee.webp" alt="Fiktive Gäste bei Kaffee"><span>Kaffee an Deck</span></div><div class="moment-tile"><img src="../../../public/ships/aidacosma.jpg" alt="AIDAcosma"><span>Unser Schiff</span></div><div class="moment-tile"><img src="assets/mara-portrait.webp" alt="Fiktive Person"><span>Hallo!</span></div></div>
+              <p class="booking-note">Die Auswahl einer Reise bestätigt keine Buchung oder Anwesenheit an Bord.</p>
+            </div>
+            <nav class="bottom-nav" aria-label="Konzept Navigation"><button><svg class="icon"><use href="#i-home"/></svg>Pinnwand</button><button class="active"><svg class="icon"><use href="#i-users"/></svg>Leute</button><button><svg class="icon"><use href="#i-chat"/></svg>Nachrichten</button><button><svg class="icon"><use href="#i-user"/></svg>Profil</button></nav>
+          </div>
+          <figcaption><span>02 / PROFIL GOSTA</span><span>Fotografija, stik, trenutki</span></figcaption>
+        </figure>
+      </div>
+      <footer class="credits"><span>Statičen vizualni predogled · brez pravih profilov in aktivnosti.</span><span>Fotografija AIDAcosma: AK-Bino, <a href="https://commons.wikimedia.org/wiki/File:AIDAcosma_04.jpg">Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Portret in fotografija gostov: ustvarjena za ta mockup.</span></footer>
+    </div>
+  </main>
+</body>
+</html>
