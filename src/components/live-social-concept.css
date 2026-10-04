@@ -1,8 +1,8 @@
 /* The social wall uses the voyage and its people as the first visual landmarks. */
 .social-live-app {
   --social-ink: #173d40;
-  --social-muted: #718780;
-  --social-teal: #167e76;
+  --social-muted: #526d66;
+  --social-teal: #116e67;
   --social-line: #e0e9e3;
   --social-paper: #f5f7f4;
   background: var(--social-paper);
@@ -67,7 +67,7 @@
   border-radius: 99px;
   background: #082d359c;
   color: #fff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 850;
   letter-spacing: .07em;
   line-height: 1;
@@ -115,7 +115,7 @@
   background: #143f47ed;
   color: #fff;
   padding: 6px 10px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 750;
 }
 
@@ -133,7 +133,7 @@
   color: #e3efec;
   text-align: right;
   text-shadow: 0 1px 3px #092e3b;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.3;
 }
 
@@ -191,13 +191,13 @@
 }
 
 .social-live-app .social-people-strip strong {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 850;
 }
 
 .social-live-app .social-people-strip small {
   color: var(--social-muted);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.35;
 }
 
@@ -236,7 +236,7 @@
 }
 
 .social-live-app .social-stories .social-section-head > button {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .social-live-app .social-story-row {
@@ -302,8 +302,8 @@
   border: 0;
   border-radius: 9px;
   background: transparent;
-  color: #718780;
-  font-size: 12px;
+  color: var(--social-muted);
+  font-size: 14px;
   text-align: left;
 }
 
@@ -336,7 +336,7 @@
   border-radius: 7px;
   background: none;
   color: #5b7973;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   margin-left: auto;
 }
@@ -355,13 +355,13 @@
 }
 
 .social-live-app .social-composer-head strong {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .social-live-app .social-composer textarea {
   min-height: 63px;
   background: #f8faf8 !important;
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.5;
 }
 
@@ -408,7 +408,7 @@
 
 .social-live-app .social-post-body {
   margin: 11px 0;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.55;
 }
 
@@ -478,7 +478,7 @@
   display: block;
   margin-top: 2px;
   color: var(--social-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .social-live-app .social-guest-profile {
@@ -496,7 +496,7 @@
   border: 0;
   background: transparent;
   color: var(--social-teal);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 850;
 }
 
@@ -539,6 +539,16 @@
   pointer-events: none;
 }
 
+.social-live-app .social-profile-cover > .social-voyage-cover-credit {
+  top: 8px;
+  right: 8px;
+  bottom: auto;
+  max-width: min(70%, 270px);
+  padding: 3px 5px;
+  border-radius: 4px;
+  background: #082d35b8;
+}
+
 .social-live-app .social-profile-hero-body {
   position: relative;
   margin: -47px auto 0;
@@ -567,13 +577,13 @@
 .social-live-app .social-profile-hero-body > p {
   margin: 5px 0 0;
   color: var(--social-muted);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
 .social-live-app .social-profile-hero-body > .social-profile-note {
   margin-top: 10px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .social-live-app .social-profile-hero-actions {
@@ -660,7 +670,7 @@
   border-radius: 9px;
   background: #e8f1eb;
   color: var(--social-teal);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -682,7 +692,7 @@
 .social-live-app .social-profile-moments > p {
   margin: 6px 0 0;
   color: var(--social-muted);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -703,7 +713,7 @@
 
 .social-live-app .social-profile-posts > p {
   color: var(--social-muted);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -715,6 +725,77 @@
 .social-live-app .social-profile-grid > .social-panel,
 .social-live-app .social-messages-page .social-panel {
   border-radius: 17px;
+}
+
+.social-live-app .social-eyebrow {
+  color: #126e66;
+  font-size: 11px;
+}
+
+.social-live-app .social-muted,
+.social-live-app .social-empty p,
+.social-live-app .social-page-head p,
+.social-live-app .social-profile-grid p {
+  color: var(--social-muted);
+  font-size: 13px;
+}
+
+.social-live-app .social-panel label {
+  font-size: 13px;
+}
+
+.social-live-app .social-primary,
+.social-live-app .social-secondary,
+.social-live-app .social-text-button,
+.social-live-app .social-section-head > button {
+  font-size: 13px;
+}
+
+.social-live-app .social-composer-bottom > button:not(.social-primary) {
+  font-size: 13px;
+}
+
+.social-live-app .social-privacy-note {
+  color: #4d6b64;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.social-live-app .social-post-author > button,
+.social-live-app .social-author-line > button {
+  font-size: 14px;
+}
+
+.social-live-app .social-post-author small,
+.social-live-app .social-author-line small,
+.social-live-app .social-composer-head small {
+  color: var(--social-muted);
+  font-size: 12px;
+}
+
+.social-live-app .social-category {
+  color: #27675f;
+  font-size: 12px;
+}
+
+.social-live-app .social-post-toolbar,
+.social-live-app .social-post-toolbar > button,
+.social-live-app .social-reaction-counts span,
+.social-live-app .social-inline-actions > button {
+  color: var(--social-muted);
+  font-size: 12px;
+}
+
+.social-live-app .social-reply-content p,
+.social-live-app .social-chat-log article p {
+  color: #294d50;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.social-live-app .social-reply-form input,
+.social-live-app .social-chat form input {
+  font-size: 14px;
 }
 
 @media (max-width: 900px) {
@@ -733,47 +814,65 @@
   }
 
   .social-live-app .social-live-main {
-    padding: 12px 13px calc(90px + env(safe-area-inset-bottom));
+    padding: 9px 13px calc(90px + env(safe-area-inset-bottom));
   }
 
   .social-live-app .social-voyage-cover {
-    min-height: 155px;
+    min-height: 142px;
     border-radius: 19px;
     box-shadow: none;
   }
 
   .social-live-app .social-voyage-cover-content {
-    padding: 11px 15px 16px;
+    padding: 10px 14px 31px;
   }
 
   .social-live-app .social-voyage-cover select {
-    top: 11px;
-    right: 11px;
-    max-width: 43%;
-    min-height: 27px;
-    padding: 4px 6px;
-    font-size: 11px;
+    top: 9px;
+    right: 9px;
+    max-width: 45%;
+    min-height: 31px;
+    padding: 4px 7px;
+    font-size: 12px;
   }
 
   .social-live-app .social-voyage-cover h1,
   .social-live-app .social-voyage-cover h2 {
-    font-size: 29px;
+    font-size: 27px;
   }
 
   .social-live-app .social-voyage-cover p {
-    font-size: 12px;
+    font-size: 13px;
   }
 
-  .social-live-app .social-voyage-cover-credit {
+  .social-live-app .social-voyage-cover > .social-voyage-cover-credit {
     right: 8px;
     bottom: 5px;
-    max-width: 45%;
-    font-size: 10px;
+    max-width: calc(100% - 16px);
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: #082d35b8;
+    font-size: 11px;
+    line-height: 1.2;
   }
 
   .social-live-app .social-people-strip {
-    min-height: 59px;
-    padding: 8px 1px 10px;
+    min-height: 52px;
+    padding: 6px 1px 7px;
+  }
+
+  .social-live-app .social-people-avatars .social-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .social-live-app .social-people-strip strong {
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .social-live-app .social-people-strip small {
+    font-size: 12px;
   }
 
   .social-live-app .social-tabs {
@@ -783,15 +882,16 @@
   }
 
   .social-live-app .social-tabs button {
-    min-height: 62px;
-    padding: 8px 2px 10px;
+    min-width: 0;
+    min-height: 60px;
+    padding: 8px 2px 9px;
     border-top-width: 3px;
-    color: #83978f;
-    font-size: 11px;
+    color: #4b6862;
+    font-size: 11.5px;
   }
 
   .social-live-app .social-tabs button.active {
-    color: var(--social-teal);
+    color: #0b6760;
   }
 
   .social-live-app .social-tabs button svg {
@@ -800,12 +900,12 @@
   }
 
   .social-live-app .social-stories {
-    margin-bottom: 7px;
-    padding: 10px 0 0;
+    margin-bottom: 4px;
+    padding: 6px 0 0;
   }
 
   .social-live-app .social-stories .social-eyebrow {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .social-live-app .social-stories .social-section-head h2 {
@@ -814,19 +914,19 @@
 
   .social-live-app .social-stories .social-section-head > button {
     gap: 4px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .social-live-app .social-story-row {
     gap: 8px;
-    padding: 8px 0 5px;
+    padding: 5px 0 4px;
   }
 
   .social-live-app .social-story,
   .social-live-app .social-story-add {
-    flex-basis: 79px;
-    width: 79px;
-    height: 94px;
+    flex-basis: 78px;
+    width: 78px;
+    height: 88px;
     padding: 7px;
     border-radius: 12px;
   }
@@ -840,18 +940,19 @@
 
   .social-live-app .social-story > strong,
   .social-live-app .social-story-add > span {
-    font-size: 11px;
+    font-size: 12px;
+    line-height: 1.2;
   }
 
   .social-live-app .social-composer {
     padding: 11px 12px;
-    margin-bottom: 14px;
+    margin-bottom: 11px;
   }
 
   .social-live-app .social-composer-collapsed {
-    min-height: 59px;
-    margin-bottom: 13px;
-    padding: 9px 10px;
+    min-height: 52px;
+    margin-bottom: 9px;
+    padding: 7px 9px;
   }
 
   .social-live-app .social-composer-collapsed > .social-avatar {
@@ -860,7 +961,7 @@
   }
 
   .social-live-app .social-composer-collapsed > button {
-    font-size: 11px;
+    font-size: 14px;
   }
 
   .social-live-app .social-composer-head .social-avatar {
@@ -869,25 +970,38 @@
   }
 
   .social-live-app .social-composer textarea {
-    min-height: 48px;
-    font-size: 11px;
+    min-height: 60px;
+    font-size: 16px;
   }
 
   .social-live-app .social-composer-bottom select {
     min-height: 34px !important;
     padding: 7px !important;
+    font-size: 16px;
+  }
+
+  .social-live-app .social-reply-form input,
+  .social-live-app .social-chat form input {
+    font-size: 16px;
   }
 
   .social-live-app .social-feed-head {
-    margin: 12px 1px 8px;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+    margin: 8px 1px 7px;
   }
 
   .social-live-app .social-feed-head h2 {
-    font-size: 20px;
+    font-size: 19px;
   }
 
   .social-live-app .social-feed-head .social-eyebrow {
-    font-size: 10px;
+    font-size: 11px;
+  }
+
+  .social-live-app .social-feed-head > button {
+    margin-left: auto;
+    font-size: 12px;
   }
 
   .social-live-app .social-post {
@@ -903,7 +1017,7 @@
 
   .social-live-app .social-post-body {
     margin: 10px 0;
-    font-size: 12px;
+    font-size: 15px;
     line-height: 1.5;
   }
 
@@ -978,6 +1092,29 @@
 
   .social-live-app .social-profile-posts > h2 {
     font-size: 18px;
+  }
+}
+
+@media (max-width: 360px) {
+  .social-live-app .social-voyage-cover select {
+    max-width: 34%;
+    padding-inline: 5px;
+    font-size: 11px;
+  }
+
+  .social-live-app .social-feed-head > button {
+    justify-content: center;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .social-live-app .social-feed-head > button svg {
+    flex: none;
+    width: 18px;
+    height: 18px;
   }
 }
 

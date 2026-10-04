@@ -145,3 +145,60 @@
   .social-app .demo-profile-edit-head h2{font-size:21px}
 }
 @media(max-width:370px){.social-app .demo-wall-people-link small{font-size:9px}.social-app .demo-stories .demo-section-head .demo-pill{display:none}.social-app .demo-guest-identity .demo-person-actions{flex-direction:column}}
+
+/* Keep the first conversation in view on phones while making the preview honest and legible. */
+.social-app .demo-mobile-cta,.social-app .demo-mobile-disclosure{display:none}
+@media(max-width:600px){
+  .social-app .social-shell main{padding-top:0}
+  .social-app .social-live-banner{min-height:52px;margin:0 -17px;padding:7px 17px;border-radius:0;gap:8px}
+  .social-app .social-live-banner .demo-desktop-cta{display:none}
+  .social-app .social-live-banner .demo-mobile-cta{display:block;font-size:12px;line-height:1.25}
+  .social-app .social-live-banner .demo-mobile-disclosure{display:block;margin-top:2px;color:#e1f0ed;font-size:11px;line-height:1.25}
+  .social-app .social-live-banner>a{min-width:96px;max-width:112px;min-height:38px;padding:6px 8px;font-size:11px;line-height:1.2}
+  .social-app .social-live-banner+.prototype-banner{display:none}
+  .social-app .prototype-banner{min-height:45px;margin:0 -17px;padding:8px 17px;border-radius:0}
+  .social-app .prototype-banner>.demo-pill,.social-app .prototype-mobile-note,.social-app .prototype-pilot-link{font-size:11px}
+  .social-app .prototype-mobile-note summary{white-space:normal;line-height:1.25}
+  .social-app .demo-voyage-cover{height:119px}
+  .social-app .demo-voyage-cover-copy{padding:10px 17px 12px}
+  .social-app .demo-cover-kicker{padding:4px 7px;font-size:11px;letter-spacing:.03em}
+  .social-app .demo-cover-kicker svg{width:13px;height:13px}
+  .social-app .demo-voyage-cover h1{font-size:27px}
+  .social-app .demo-voyage-cover p,.social-app .demo-voyage-cover small{font-size:11px}
+  .social-app .demo-wall-people-link{min-height:48px;margin:6px 0 8px;padding:5px 8px;gap:9px}
+  .social-app .demo-wall-people-link strong{font-size:13px}
+  .social-app .demo-wall-people-link small{font-size:11px}
+  .social-app .demo-wall-people-link small,.social-app .demo-wall-post .post-author small{color:#536f68}
+  .social-app .demo-wall-face-stack .social-avatar{width:27px;height:27px}
+  .social-app .demo-stories{margin-bottom:7px}
+  .social-app .demo-stories .demo-section-head{margin-bottom:5px}
+  .social-app .demo-stories .demo-section-head h2,.social-app .demo-feed-head h2{font-size:17px}
+  .social-app .demo-stories .demo-section-head .demo-pill,.social-app .demo-feed-head .demo-pill{font-size:11px}
+  .social-app .demo-stories-row{gap:8px;padding-bottom:3px}
+  .social-app .demo-story-card,.social-app .demo-story-add{flex-basis:68px;width:68px}
+  .social-app .demo-story-card .demo-story-image,.social-app .demo-story-add .demo-story-image{width:68px;height:65px}
+  .social-app .demo-story-add{flex-basis:78px;width:78px}
+  .social-app .demo-story-add .demo-story-image{width:78px}
+  .social-app .demo-story-card>strong,.social-app .demo-story-add>strong{font-size:11px}
+  .social-app .demo-story-card>small,.social-app .demo-story-add>small{font-size:11px}
+  .social-app .demo-story-card>small,.social-app .demo-story-add>small{color:#735942}
+  .social-app .demo-story-plus{right:7px;bottom:4px}
+  .social-app .demo-wall-composer{margin-top:2px;padding:5px 8px}
+  .social-app .demo-wall-composer>button:nth-child(2){min-height:37px;font-size:14px}
+  .social-app .demo-wall-composer .demo-composer-photo{width:35px;height:35px}
+  .social-app .demo-feed-head{margin:7px 0 6px}
+  .social-app .demo-feed-head .eyebrow{display:none}
+  .social-app .demo-wall-post{padding:10px!important}
+  .social-app .demo-wall-post .social-card-top{margin-bottom:6px}
+  .social-app .demo-wall-post .social-category,.social-app .demo-wall-post .demo-post-badges .demo-pill{font-size:11px}
+  .social-app .demo-wall-post .post-author .social-avatar{width:33px;height:33px}
+  .social-app .demo-wall-post .post-body{font-size:14px!important;line-height:1.48!important;margin-bottom:6px}
+  .social-app .demo-example-photo{margin:7px 0}
+  .social-app .demo-example-photo small{font-size:11px}
+  .social-app .demo-guest-about>small,.social-app .demo-guest-identity .demo-person-note{font-size:11px}
+}
+@media(max-width:370px){
+  .social-app .demo-wall-people-link small{font-size:11px}
+  .social-app .demo-stories .demo-section-head .demo-pill{display:inline-block}
+  .social-app .demo-stories .demo-section-head h2{font-size:16px}
+}
