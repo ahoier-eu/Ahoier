@@ -846,6 +846,30 @@
   margin-top: 16px;
 }
 
+.social-live-app .social-people-interest-filter {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  max-width: 280px;
+}
+
+.social-live-app .social-people-interest-filter label {
+  margin: 0;
+  color: #345b57;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.social-live-app .social-people-interest-filter select {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid #cbded7;
+  border-radius: 10px;
+  background: #fbfdfb;
+  color: #193e42;
+}
+
 .social-live-app .social-people-page,
 .social-live-app .social-profile-grid > .social-panel,
 .social-live-app .social-messages-page .social-panel {

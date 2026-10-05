@@ -1,0 +1,180 @@
+.section {
+  min-width: 0;
+  margin: 11px 0 16px;
+  color: var(--social-ink, #173d40);
+}
+
+.sectionHead, .formTitle, .cardTop, .cardActions, .formActions, .dialogHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sectionHead { margin: 0 1px 10px; }
+.sectionHead h2 {
+  margin: 2px 0 0;
+  font-family: 'Bricolage Grotesque', Arial, sans-serif;
+  font-size: 21px;
+  letter-spacing: -.035em;
+  line-height: 1.2;
+}
+.eyebrow { color: #126e66; font-size: 10px; font-weight: 850; letter-spacing: .1em; }
+
+.section button, .reportDialog button { cursor: pointer; font: inherit; }
+.section button:disabled, .reportDialog button:disabled { cursor: not-allowed; opacity: .6; }
+.section button:focus-visible, .section input:focus-visible, .section textarea:focus-visible,
+.reportDialog button:focus-visible, .reportDialog select:focus-visible, .reportDialog textarea:focus-visible {
+  outline: 3px solid #80bdb4;
+  outline-offset: 2px;
+}
+.newButton, .primary, .secondary, .joined, .danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1.25;
+}
+.newButton, .primary { border: 1px solid #126e66; background: #126e66; color: #fff; }
+.newButton:hover, .primary:hover { background: #0e5c55; }
+.secondary, .joined { border: 1px solid #bad8ce; background: #edf6f0; color: #155f57; }
+.secondary:hover, .joined:hover { background: #e1f0e8; }
+.danger { border: 1px solid #a9473f; background: #a9473f; color: #fff; }
+.danger:hover { background: #87392f; }
+
+.quiet, .empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid #e0e9e3;
+  border-radius: 15px;
+  background: #fff;
+  color: #526d66;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.quiet button { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; border: 0; background: transparent; color: #116e67; font-weight: 750; }
+.empty { display: flex; align-items: center; gap: 11px; }
+.empty svg { flex: none; color: #398b7e; }
+.empty p { margin: 0; }
+.messages:empty { display: none; }
+.error, .notice { margin: 0 0 10px; padding: 9px 11px; border-radius: 9px; font-size: 12px; line-height: 1.4; }
+.error { background: #fff0eb; color: #8d4039; }
+.notice { background: #e6f3ea; color: #155c50; }
+
+.form {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 13px;
+  padding: 16px;
+  border: 1px solid #dce8df;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 20px #173d400c;
+}
+.formTitle { align-items: flex-start; }
+.formTitle h3 { margin: 0; font-size: 17px; }
+.formTitle p { margin: 3px 0 0; color: #526d66; font-size: 12px; }
+.formTitle > button, .dialogHead > button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: #edf4ef;
+  color: #315d58;
+}
+.formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px 13px; }
+.formGrid label, .reportDialog label { display: grid; align-content: start; gap: 5px; min-width: 0; color: #315a56; font-size: 12px; font-weight: 750; }
+.formGrid .full { grid-column: 1 / -1; }
+.formGrid input, .formGrid textarea, .reportDialog select, .reportDialog textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 9px 10px;
+  border: 1px solid #cadbd2;
+  border-radius: 9px;
+  background: #fbfdfb;
+  color: #173d40;
+  font: inherit;
+  font-size: 15px;
+}
+.formGrid textarea, .reportDialog textarea { resize: vertical; }
+.safety, .footerNote { margin: 0; color: #526d66; font-size: 11px; line-height: 1.5; }
+.safety { padding: 9px 11px; border-radius: 9px; background: #eef5f0; }
+.formActions { justify-content: flex-end; }
+
+.cards {
+  display: grid;
+  grid-auto-columns: minmax(250px, 75%);
+  grid-auto-flow: column;
+  gap: 11px;
+  overflow-x: auto;
+  padding: 1px 1px 9px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+.allCards { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+.card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #dce8df;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 5px 20px #173d400b;
+  scroll-snap-align: start;
+  scroll-margin-top: 90px;
+}
+.card:focus-visible { outline: 3px solid #80bdb4; outline-offset: 3px; }
+.canceled { background: #f8faf8; }
+.cardTop { justify-content: flex-start; gap: 7px; min-height: 25px; }
+.dateIcon { display: inline-flex; color: #1b7c71; }
+.cardDate { color: #1b6c63; font-size: 12px; font-weight: 800; }
+.canceledBadge { margin-left: auto; padding: 4px 7px; border-radius: 6px; background: #f8e8e5; color: #8d4039; font-size: 11px; font-weight: 800; }
+.card h3 { margin: 10px 0 5px; font-size: 17px; line-height: 1.25; overflow-wrap: anywhere; }
+.description { margin: 1px 0 10px; color: #3f5d58; font-size: 13px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.meta { display: flex; align-items: flex-start; gap: 6px; margin: 5px 0 0; color: #526d66; font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+.meta svg { flex: none; margin-top: 1px; color: #2a8577; }
+.organizer { margin: 8px 0 0; color: #526d66; font-size: 11px; }
+.attendeesToggle { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin: 10px 0 0; padding: 2px 0; border: 0; background: transparent; color: #116e67; font-size: 12px !important; font-weight: 750 !important; text-align: left; }
+.attendeesToggle:hover, .reportButton:hover, .showAll:hover { text-decoration: underline; }
+.attendees { margin-top: 8px; padding: 9px; border-radius: 9px; background: #f2f7f3; color: #3f5d58; font-size: 12px; }
+.attendees p { margin: 0; }
+.attendees ul { display: flex; flex-wrap: wrap; gap: 5px 8px; margin: 0; padding: 0; list-style: none; }
+.attendees li { padding: 3px 7px; border-radius: 6px; background: #fff; overflow-wrap: anywhere; }
+.attendees li small { margin-left: 5px; color: #71857f; font-size: 10px; }
+.cardActions { flex-wrap: wrap; justify-content: flex-start; margin-top: auto; padding-top: 13px; }
+.reportButton { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; padding: 5px 0; border: 0; background: transparent; color: #526d66; font-size: 11px !important; }
+.inactive { color: #526d66; font-size: 12px; }
+.confirm { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.confirm span { width: 100%; color: #8d4039; font-size: 12px; font-weight: 750; }
+.showAll { display: block; margin: 5px auto 0; padding: 6px 10px; border: 0; background: transparent; color: #116e67; font-size: 12px !important; font-weight: 800 !important; }
+.footerNote { margin: 6px 1px 0; }
+
+.reportDialog { width: min(420px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 0; border-radius: 17px; color: #173d40; box-shadow: 0 18px 50px #173d4055; }
+.reportDialog::backdrop { background: #102f36aa; }
+.reportDialog form { display: grid; gap: 10px; padding: 18px; }
+.dialogHead h2 { margin: 0; font-size: 19px; }
+.reportDialog p { margin: 0 0 4px; color: #526d66; font-size: 12px; line-height: 1.5; }
+.reportDialog .primary { justify-self: end; margin-top: 3px; }
+
+@media (max-width: 620px) {
+  .sectionHead { align-items: flex-start; flex-wrap: wrap; }
+  .sectionHead h2 { font-size: 19px; }
+  .newButton { min-height: 34px; padding: 7px 10px; }
+  .cards { grid-auto-columns: minmax(255px, 89%); }
+  .allCards { grid-template-columns: minmax(0, 1fr); }
+  .form { padding: 13px; }
+  .formGrid { grid-template-columns: minmax(0, 1fr); }
+  .formGrid .full { grid-column: auto; }
+  .formGrid input, .formGrid textarea { font-size: 16px; }
+}

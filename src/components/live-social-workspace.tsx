@@ -14,6 +14,7 @@ import {
   type SocialData, type SocialFriendRequest, type SocialMessage, type SocialPostCursor, type SocialPostsPage, type SocialProfile, type SocialPost, type SocialReply, type SocialReplyPhoto, type SocialStory, type SocialVoyage,
 } from "./live-social-data";
 import type { NotificationDestination } from "./live-social-notifications";
+import { LiveSocialMeetups, type CreateMeetupInput, type MeetupAttendee, type MeetupReportReason, type SocialMeetup } from "./live-social-meetups";
 
 export type { SocialProfile, SocialVoyage } from "./live-social-data";
 
@@ -110,6 +111,8 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [version, setVersion] = useState(0);
+  const [meetupVersion, setMeetupVersion] = useState(0);
+  const [meetupState, setMeetupState] = useState<{ voyageId: string; rows: SocialMeetup[]; status: "loading" | "ready" | "unavailable" | "error" }>({ voyageId: voyage.id, rows: [], status: "loading" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -126,6 +129,7 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
   const [composerExpanded, setComposerExpanded] = useState(false);
   const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
   const [peopleSearch, setPeopleSearch] = useState("");
+  const [peopleInterest, setPeopleInterest] = useState("");
   const [activePeerId, setActivePeerId] = useState("");
   const [messageBody, setMessageBody] = useState("");
   const [conversation, setConversation] = useState<SocialMessage[]>([]);
@@ -146,6 +150,7 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
   const [profilePageErrorFor, setProfilePageErrorFor] = useState("");
   const [profileRetry, setProfileRetry] = useState(0);
   const [focusedPostId, setFocusedPostId] = useState("");
+  const [focusedMeetupId, setFocusedMeetupId] = useState("");
   const [focusRequest, setFocusRequest] = useState(0);
   const [focusedPostPage, setFocusedPostPage] = useState<SocialPostsPage | null>(null);
   const [focusedPostLoading, setFocusedPostLoading] = useState(false);
@@ -172,6 +177,22 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
   }, [client, userId, voyage.id, version]);
 
   useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const result = await client.rpc("ahoier_meetup_summary", { p_voyage_id: voyage.id });
+      if (!active) return;
+      if (result.error) {
+        const missing = ["42883", "PGRST202"].includes(result.error.code);
+        setMeetupState({ voyageId: voyage.id, rows: [], status: missing ? "unavailable" : "error" });
+      } else {
+        setMeetupState({ voyageId: voyage.id, rows: (result.data ?? []) as SocialMeetup[], status: "ready" });
+      }
+    };
+    void load();
+    return () => { active = false; };
+  }, [client, voyage.id, version, meetupVersion]);
+
+  useEffect(() => {
     const timer = window.setInterval(() => {
       if (document.visibilityState === "visible") setVersion(current => current + 1);
     }, tab === "messages" ? 10_000 : 60_000);
@@ -185,11 +206,27 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
   const friendSet = useMemo(() => new Set(friends), [friends]);
   const activePeer = activePeerId && friendSet.has(activePeerId) ? activePeerId : friends[0] ?? "";
   const selectedStory = data.stories.find(story => story.id === selectedStoryId);
-  const directory = data.directory.filter(id => id !== userId && !blocked.has(id) && data.profiles[id]?.display_name.toLocaleLowerCase("de").includes(peopleSearch.toLocaleLowerCase("de")));
+  const availableInterests = PROFILE_INTERESTS.filter(interest => data.directory.some(id =>
+    id !== userId && !blocked.has(id) && data.profiles[id]?.interests?.includes(interest)));
+  const ownInterests = new Set(profile.interests ?? []);
+  const directory = data.directory.filter(id => {
+    const person = data.profiles[id];
+    return id !== userId && !blocked.has(id) && !!person
+      && person.display_name.toLocaleLowerCase("de").includes(peopleSearch.trim().toLocaleLowerCase("de"))
+      && (!peopleInterest || person.interests?.includes(peopleInterest));
+  }).sort((a, b) => {
+    const matchCount = (id: string) => data.profiles[id]?.interests?.filter(interest => ownInterests.has(interest)).length ?? 0;
+    return matchCount(b) - matchCount(a)
+      || (data.profiles[a]?.display_name ?? "").localeCompare(data.profiles[b]?.display_name ?? "", "de");
+  });
   const selectedPerson = selectedPersonId && !blocked.has(selectedPersonId) ? data.profiles[selectedPersonId] ?? extraProfiles[selectedPersonId] : undefined;
   const selectedPersonInVoyage = selectedPersonId ? data.directory.includes(selectedPersonId) : false;
   const coverPhoto = SHIP_PHOTOS[voyage.ship];
   const coverCredit = SHIP_PHOTO_CREDITS[voyage.ship];
+  const liveMeetupStatus = meetupState.voyageId === voyage.id ? meetupState.status : "loading";
+  const liveMeetups = meetupState.voyageId === voyage.id ? meetupState.rows.map(meetup => ({
+    ...meetup, organizer_name: data.profiles[meetup.organizer_id]?.display_name ?? null,
+  })) : [];
   const previewPeople = data.directory.filter(id => id !== userId && !blocked.has(id)).slice(0, 3);
   const profilePersonId = tab === "profile" ? userId : tab === "people" && selectedPersonInVoyage ? selectedPersonId : "";
   const visibleProfilePages = useMemo(() => profileLoadedFor === profilePersonId ? profilePages : [], [profileLoadedFor, profilePersonId, profilePages]);
@@ -283,7 +320,10 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
         else { setError("Diese Reisegruppe ist für dich nicht verfügbar."); onNavigationHandled(); }
         return;
       }
-      if (navigation.kind === "message") {
+      if (navigation.kind === "meetup_changed" || navigation.kind === "meetup_canceled" || navigation.kind === "meetup_removed") {
+        setTab("wall");
+        setFocusedMeetupId(navigation.kind === "meetup_removed" ? "" : navigation.meetupId ?? "");
+      } else if (navigation.kind === "message") {
         if (friendSet.has(navigation.actorId)) { setActivePeerId(navigation.actorId); setTab("messages"); }
         else setError("Dieses Gespräch ist nicht mehr verfügbar.");
       } else if (navigation.kind === "friend_request" || navigation.kind === "friend_accepted") {
@@ -316,6 +356,15 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
     const target = document.getElementById(`social-post-${focusedPostId}`);
     if (target) { target.scrollIntoView({ behavior: "smooth", block: "start" }); target.focus({ preventScroll: true }); }
   }, [tab, focusedPostId, focusRequest, focusedPostLoading, focusedPostPage, loaded]);
+
+  useEffect(() => {
+    if (tab !== "wall" || !focusedMeetupId || meetupState.voyageId !== voyage.id || meetupState.status !== "ready") return;
+    let active = true;
+    const target = document.getElementById(`social-meetup-${focusedMeetupId}`);
+    if (target) { target.scrollIntoView({ behavior: "smooth", block: "center" }); target.focus({ preventScroll: true }); }
+    queueMicrotask(() => { if (active) { if (!target) setError("Dieses Treffen ist nicht mehr sichtbar."); setFocusedMeetupId(""); } });
+    return () => { active = false; };
+  }, [tab, focusedMeetupId, meetupState, voyage.id]);
 
   useEffect(() => {
     if (tab !== "messages" || !activePeer) return;
@@ -373,6 +422,36 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
   }
 
   function refresh() { setVersion(current => current + 1); }
+  async function meetupAction(name: string, args: Record<string, unknown>) {
+    const result = await client.rpc(name, args);
+    if (result.error) throw result.error;
+    setMeetupVersion(current => current + 1);
+  }
+  async function createMeetup(input: CreateMeetupInput) {
+    await meetupAction("ahoier_create_meetup", {
+      p_voyage_id: voyage.id, p_title: input.title, p_description: input.description,
+      p_location_label: input.location_label, p_starts_at: input.starts_at,
+      p_time_zone: input.time_zone, p_capacity: input.capacity,
+    });
+  }
+  async function updateMeetup(id: string, input: CreateMeetupInput) {
+    await meetupAction("ahoier_update_meetup", {
+      p_meetup_id: id, p_title: input.title, p_description: input.description,
+      p_location_label: input.location_label, p_starts_at: input.starts_at,
+      p_time_zone: input.time_zone, p_capacity: input.capacity,
+    });
+  }
+  async function loadMeetupAttendees(id: string): Promise<MeetupAttendee[]> {
+    const result = await client.rpc("ahoier_meetup_attendees", { p_meetup_id: id });
+    if (result.error) throw result.error;
+    return (result.data ?? []) as MeetupAttendee[];
+  }
+  async function reportMeetup(id: string, reason: MeetupReportReason, details: string) {
+    const result = await client.from("ahoier_reports").insert({
+      meetup_id: id, reporter_id: userId, reason, details,
+    });
+    if (result.error) throw result.error;
+  }
   function showError(message: string) { setError(message); setNotice(""); }
   async function perform(action: () => Promise<void>, success?: string) {
     setBusy(true); setError(""); setNotice("");
@@ -693,6 +772,12 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
     if (blocked.has(id) || !(data.profiles[id] ?? extraProfiles[id])) return;
     setPeopleSearch(""); setSelectedPersonId(id); setTab("people"); window.scrollTo(0, 0);
   }
+  function personSubtitle(id: string) {
+    const interests = data.profiles[id]?.interests ?? [];
+    const shared = interests.filter(interest => ownInterests.has(interest));
+    if (shared.length) return `Gemeinsame Interessen: ${shared.slice(0, 2).join(" · ")}`;
+    return interests.length ? `Interessen: ${interests.slice(0, 2).join(" · ")}` : "Mitglied dieser Reisegruppe";
+  }
   function profileActions(id: string) {
     const request = requestFor(id);
     return <div className="social-profile-hero-actions">
@@ -825,6 +910,16 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
     <nav className="social-tabs" aria-label="Community"><div>{nav.map(item => <button key={item.id} type="button" className={tab === item.id ? "active" : ""} aria-current={tab === item.id ? "page" : undefined} onClick={() => { setSelectedPersonId(""); setTab(item.id); window.scrollTo(0, 0); }}><item.icon size={19} /><span>{item.label}</span></button>)}</div></nav>
     {tab === "wall" && <div className="social-wall-layout"><div className="social-wall-main">
       <button type="button" className="social-people-strip" onClick={() => { setSelectedPersonId(""); setTab("people"); window.scrollTo(0, 0); }}><span className="social-people-avatars">{previewPeople.map(id => <Avatar key={id} client={client} profile={data.profiles[id]} size="small" />)}{!previewPeople.length && <Users size={22} />}</span><span className="social-people-strip-copy"><strong>Menschen deiner Reisegruppe entdecken</strong><small>{previewPeople.length ? `${previewPeople.length} ${previewPeople.length === 1 ? "Gesicht" : "Gesichter"} aus deiner Reisegruppe` : "Wer ist auf Ahoier dabei?"}</small></span><ArrowRight size={19} /></button>
+      <LiveSocialMeetups
+        meetups={liveMeetups} status={liveMeetupStatus} userId={userId} focusMeetupId={focusedMeetupId}
+        voyageStartDate={voyage.starts_on} voyageEndDate={voyage.ends_on}
+        onCreate={createMeetup} onUpdate={updateMeetup}
+        onJoin={id => meetupAction("ahoier_rsvp_meetup", { p_meetup_id: id })}
+        onLeave={id => meetupAction("ahoier_leave_meetup", { p_meetup_id: id })}
+        onCancel={id => meetupAction("ahoier_cancel_meetup", { p_meetup_id: id })}
+        onLoadAttendees={loadMeetupAttendees} onReport={reportMeetup}
+        onRefresh={() => setMeetupVersion(current => current + 1)}
+      />
       {data.repliesTruncated && <p className="social-reply-limit" role="status">Es werden die neuesten 300 Antworten der angezeigten Beiträge geladen. Ältere Antworten kannst du je Beitrag nachladen.</p>}<section className="social-panel social-stories" aria-labelledby="social-stories-title"><div className="social-section-head"><div><span className="social-eyebrow">MOMENTE AN BORD</span><h2 id="social-stories-title">Stories</h2></div><button type="button" onClick={() => setShowStoryComposer(current => !current)}><Camera size={17} /> Story teilen</button></div><div className="social-story-row"><button type="button" className="social-story-add" onClick={() => setShowStoryComposer(true)}><Avatar client={client} profile={profile} size="large" /><span>Deine Story <strong>+</strong></span></button>{data.stories.map(storyTile)}{loaded && !data.stories.length && <p className="social-muted">Noch keine Stories. Teile einen Moment deiner Reise.</p>}</div>{showStoryComposer && <form className="social-story-composer" onSubmit={event => void publishStory(event)}><label htmlFor="social-story-photo">Ein Foto für 24 Stunden</label><input id="social-story-photo" type="file" accept="image/jpeg,image/png,image/webp" onChange={event => void selectStoryFile(event.target.files?.[0])} required /><SelectedPhotos files={storyFile ? [storyFile] : []} /><label htmlFor="social-story-caption">Kurzer Text (freiwillig)</label><input id="social-story-caption" value={storyCaption} onChange={event => setStoryCaption(event.target.value)} maxLength={160} placeholder="Was passiert gerade an Bord?" /><p className="social-privacy-note">Jede angemeldete Person kann dieser Reisegruppe beitreten und deine Story sehen.</p><button className="social-primary" disabled={busy || !storyFile}>Story teilen</button></form>}</section>
       {!composerExpanded ? <div className="social-panel social-composer-collapsed"><Avatar client={client} profile={profile} /><button type="button" onClick={() => setComposerExpanded(true)}>{postBody || postFiles.length ? "Entwurf fortsetzen …" : "Was möchtest du teilen?"}<Camera size={20} /></button></div> : <form className="social-panel social-composer" onSubmit={event => void publishPost(event)}><div className="social-composer-head"><Avatar client={client} profile={profile} /><div><strong>Was möchtest du teilen, {profile.display_name}?</strong><small>Fragen, Tipps und Momente deiner Reise</small></div><button className="social-composer-close" type="button" onClick={() => setComposerExpanded(false)} aria-label="Beitragsformular schließen"><X size={18} /></button></div><label className="sr-only" htmlFor="social-post-text">Beitrag</label><textarea ref={composerTextarea} id="social-post-text" value={postBody} onChange={event => setPostBody(event.target.value)} maxLength={1000} rows={3} placeholder="Schreib etwas für deine Reisegruppe …" /><SelectedPhotos files={postFiles} /><div className="social-composer-bottom"><select aria-label="Kategorie" value={category} onChange={event => setCategory(event.target.value as typeof category)}>{CATEGORIES.map(item => <option key={item}>{item}</option>)}</select><label className="social-add-photo"><ImageIcon size={18} /> Fotos<input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={event => void selectPostFiles(event.target.files)} aria-label="Bis zu vier Fotos auswählen" /></label>{postFiles.length > 0 && <button type="button" onClick={() => { setPostFiles([]); if (fileInput.current) fileInput.current.value = ""; }}>Fotos entfernen</button>}<button className="social-primary" disabled={busy || !postBody.trim() && !postFiles.length}>Teilen <ArrowRight size={15} /></button></div><p className="social-privacy-note">Alle angemeldeten Personen, die diese Reise auswählen, können deine Beiträge und Fotos sehen.</p></form>}
       <div className="social-feed-head"><div><span className="social-eyebrow">GEMEINSAM AN BORD</span><h2>Aus der Reisegruppe</h2></div><button type="button" onClick={() => { pageEpoch.current += 1; setWallPages([]); setFocusedPostPage(null); refresh(); }} disabled={loading}><RefreshCw size={16} /> Aktualisieren</button></div>{!loaded ? <div className="social-panel social-center" role="status">Beiträge werden geladen …</div> : !visibleWallPosts.length ? <div className="social-panel social-empty"><MessageCircle size={28} /><h3>Hier beginnt das Gespräch.</h3><p>Stell die erste Frage oder teile einen Moment deiner Reise.</p></div> : <div className="social-post-list">{visibleWallPosts.map(postCard)}</div>}{wallHasMore && <button type="button" className="social-load-older social-load-posts" disabled={wallPageLoading} onClick={() => void loadOlderWallPosts()}>{wallPageLoading ? "Wird geladen ?" : "Weitere Beitr?ge laden"}</button>}</div><aside className="social-wall-aside"><section className="social-panel"><span className="social-eyebrow">LEUTE AN BORD</span><h2>Neue Gesichter</h2><div className="social-aside-people">{data.directory.filter(id => id !== userId && !blocked.has(id)).slice(0, 4).map(id => <button type="button" key={id} onClick={() => openPerson(id)}><Avatar client={client} profile={data.profiles[id]} /><span>{data.profiles[id]?.display_name ?? "Gast"}</span><ArrowRight size={15} /></button>)}</div><button type="button" className="social-text-button" onClick={() => setTab("people")}>Alle Mitglieder ansehen <ArrowRight size={15} /></button></section><section className="social-panel"><span className="social-eyebrow">GUT ZU WISSEN</span><h2>Offene Reisegruppe</h2><p>Die Auswahl einer Reise bestätigt keine Buchung. Teile nur Fotos und Informationen, die du in dieser Gruppe zeigen möchtest.</p></section></aside></div>}
@@ -837,7 +932,7 @@ export function LiveSocialWorkspace({ client, userId, profile, voyage, voyages, 
         {selectedPersonInVoyage && profilePostsSection()}
         <p className="social-guest-disclaimer">Die Auswahl einer Reisegruppe bestätigt keine Buchung oder Anwesenheit an Bord.</p>
       </> : <div className="social-panel social-empty"><p>Dieses Profil ist nicht mehr verfügbar.</p></div>}
-    </section> : <section className="social-panel social-people-page"><div className="social-page-head"><span className="social-eyebrow">NEUE BEKANNTSCHAFTEN</span><h1>Leute deiner Reisegruppe</h1><p>Hier siehst du angemeldete Mitglieder. Eine Buchung oder Anwesenheit an Bord wurde nicht geprüft.</p></div><label htmlFor="social-people-search">Personen suchen</label><input id="social-people-search" type="search" value={peopleSearch} onChange={event => setPeopleSearch(event.target.value)} placeholder="Name suchen" /><div className="social-people-list">{data.requests.filter(request => request.recipient_id === userId && request.status === "pending" && !blocked.has(request.requester_id)).length > 0 && <section className="social-incoming-requests"><h2>Offene Freundschaftsanfragen</h2><p>Auch Anfragen aus früheren Reisegruppen erscheinen hier.</p>{data.requests.filter(request => request.recipient_id === userId && request.status === "pending" && !blocked.has(request.requester_id)).map(request => <article key={request.id} className="social-person"><button type="button" className="social-person-open" onClick={() => openPerson(request.requester_id)}><Avatar client={client} profile={data.profiles[request.requester_id]} size="large" /><span><strong>{data.profiles[request.requester_id]?.display_name ?? "Gast"}</strong><small>Hat dir eine Anfrage gesendet</small></span></button>{personActions(request.requester_id)}</article>)}</section>}{directory.map(id => <article key={id} className="social-person"><button type="button" className="social-person-open" onClick={() => openPerson(id)}><Avatar client={client} profile={data.profiles[id]} size="large" /><span><strong>{data.profiles[id]?.display_name ?? "Gast"}</strong><small>Mitglied dieser Reisegruppe</small></span><ArrowRight size={17} aria-hidden="true" /></button></article>)}{loaded && !directory.length && <p className="social-muted">Keine Personen gefunden.</p>}</div></section>)}
+    </section> : <section className="social-panel social-people-page"><div className="social-page-head"><span className="social-eyebrow">NEUE BEKANNTSCHAFTEN</span><h1>Leute deiner Reisegruppe</h1><p>Hier siehst du angemeldete Mitglieder. Eine Buchung oder Anwesenheit an Bord wurde nicht geprüft.</p></div><label htmlFor="social-people-search">Personen suchen</label><input id="social-people-search" type="search" value={peopleSearch} onChange={event => setPeopleSearch(event.target.value)} placeholder="Name suchen" />{availableInterests.length > 0 && <div className="social-people-interest-filter"><label htmlFor="social-people-interest">Nach Interesse filtern</label><select id="social-people-interest" value={peopleInterest} onChange={event => setPeopleInterest(event.target.value)}><option value="">Alle Interessen</option>{availableInterests.map(interest => <option key={interest} value={interest}>{interest}</option>)}</select></div>}<div className="social-people-list">{data.requests.filter(request => request.recipient_id === userId && request.status === "pending" && !blocked.has(request.requester_id)).length > 0 && <section className="social-incoming-requests"><h2>Offene Freundschaftsanfragen</h2><p>Auch Anfragen aus früheren Reisegruppen erscheinen hier.</p>{data.requests.filter(request => request.recipient_id === userId && request.status === "pending" && !blocked.has(request.requester_id)).map(request => <article key={request.id} className="social-person"><button type="button" className="social-person-open" onClick={() => openPerson(request.requester_id)}><Avatar client={client} profile={data.profiles[request.requester_id]} size="large" /><span><strong>{data.profiles[request.requester_id]?.display_name ?? "Gast"}</strong><small>Hat dir eine Anfrage gesendet</small></span></button>{personActions(request.requester_id)}</article>)}</section>}{directory.map(id => <article key={id} className="social-person"><button type="button" className="social-person-open" onClick={() => openPerson(id)}><Avatar client={client} profile={data.profiles[id]} size="large" /><span><strong>{data.profiles[id]?.display_name ?? "Gast"}</strong><small>{personSubtitle(id)}</small></span><ArrowRight size={17} aria-hidden="true" /></button></article>)}{loaded && !directory.length && <p className="social-muted">Keine Personen gefunden.</p>}</div></section>)}
     {tab === "messages" && <section className="social-messages-page"><div className="social-page-head"><span className="social-eyebrow">IN VERBINDUNG</span><h1>Nachrichten</h1><p>Private Gespräche sind erst nach bestätigter Freundschaft möglich.</p></div>{friends.length === 0 ? <div className="social-panel social-empty"><Heart size={29} /><h2>Noch keine bestätigten Freundschaften</h2><p>Entdecke Menschen in deiner Reisegruppe und sende eine Anfrage.</p><button type="button" className="social-primary" onClick={() => setTab("people")}>Leute ansehen <ArrowRight size={16} /></button></div> : <div className="social-chat-layout"><nav className="social-chat-list" aria-label="Gespräche">{friends.map(id => <button type="button" key={id} className={id === activePeer ? "active" : ""} onClick={() => setActivePeerId(id)}><Avatar client={client} profile={data.profiles[id]} /><span><strong>{data.profiles[id]?.display_name ?? "Gast"}</strong><small>{messagesWith(id).at(-1)?.body ?? "Verlauf öffnen"}</small></span></button>)}</nav>{activePeer && <div className="social-panel social-chat"><header><Avatar client={client} profile={data.profiles[activePeer]} /><div><h2>{data.profiles[activePeer]?.display_name ?? "Gast"}</h2><small>Bestätigte Freundschaft · private Unterhaltung</small></div><button type="button" onClick={() => void block(activePeer)} aria-label="Person blockieren"><Ban size={17} /></button></header><div className="social-chat-log" role="log" aria-label="Private Nachrichten">{conversationPeer === activePeer && conversationHasMore && <button type="button" className="social-load-older" disabled={conversationLoading} onClick={() => void loadOlderMessages()}>Ältere Nachrichten laden</button>}{conversationLoading && <p className="social-muted" role="status">Nachrichten werden geladen …</p>}{conversationError && <p className="social-chat-error" role="alert">{conversationError}</p>}{messagesWith(activePeer).map(message => <article key={message.id} className={message.sender_id === userId ? "mine" : ""}><p>{message.body}</p><small>{timeLabel(message.created_at)}</small><button type="button" onClick={() => message.sender_id === userId ? void remove("message", message.id) : setReportTarget({ kind: "message", id: message.id })}>{message.sender_id === userId ? "Für mich entfernen" : "Melden"}</button></article>)}{conversationPeer === activePeer && !conversationLoading && !messagesWith(activePeer).length && <p className="social-muted">Sag zuerst Ahoi.</p>}</div><form onSubmit={event => void sendMessage(event)}><label className="sr-only" htmlFor="social-message-text">Nachricht schreiben</label><input id="social-message-text" value={messageBody} onChange={event => setMessageBody(event.target.value)} maxLength={1000} placeholder="Nachricht schreiben …" /><button type="submit" disabled={busy || !messageBody.trim()} aria-label="Nachricht senden"><Send size={19} /></button></form></div>}</div>}</section>}
     {tab === "profile" && <section className="social-profile-page">
       {profileHero(profile, true, true)}

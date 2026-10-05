@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { Bell, Check, CheckCheck, Heart, Mail, MessageCircle, RefreshCw, UserCheck, UserPlus, X } from "lucide-react";
+import { Bell, CalendarDays, Check, CheckCheck, Heart, Mail, MessageCircle, RefreshCw, UserCheck, UserPlus, X } from "lucide-react";
 import styles from "./live-social-notifications.module.css";
 
-export type NotificationKind = "friend_request" | "friend_accepted" | "reply" | "reaction" | "message";
+export type NotificationKind = "friend_request" | "friend_accepted" | "reply" | "reaction" | "message" | "meetup_changed" | "meetup_canceled" | "meetup_removed";
 
 export type SocialNotification = {
   id: string;
@@ -17,6 +17,7 @@ export type SocialNotification = {
   message_id: string | null;
   friend_request_id: string | null;
   voyage_id: string | null;
+  meetup_id: string | null;
   created_at: string;
   read_at: string | null;
 };
@@ -27,6 +28,7 @@ export type NotificationDestination = {
   voyageId?: string;
   postId?: string;
   replyId?: string;
+  meetupId?: string;
 };
 
 type Props = {
@@ -37,7 +39,9 @@ type Props = {
 };
 
 const ROWS_LIMIT = 30;
-const FIELDS = "id,recipient_id,actor_id,kind,post_id,reply_id,message_id,friend_request_id,voyage_id,created_at,read_at";
+// Selecting the row keeps this panel usable between frontend deployment and
+// the meetup migration, when the optional meetup_id column does not exist yet.
+const FIELDS = "*";
 
 function isMigrationMissing(code?: string) {
   return code === "42P01" || code === "PGRST205";
@@ -51,6 +55,9 @@ function notificationText(item: SocialNotification, actorName?: string) {
     case "reply": return `${who} hat auf deinen Beitrag geantwortet.`;
     case "reaction": return `${who} hat auf ${item.reply_id ? "deine Antwort" : "deinen Beitrag"} reagiert.`;
     case "message": return `${who} hat dir eine Nachricht gesendet.`;
+    case "meetup_changed": return `${who} hat ein Treffen geändert, bei dem du dabei bist.`;
+    case "meetup_canceled": return `${who} hat ein Treffen abgesagt, bei dem du dabei bist.`;
+    case "meetup_removed": return "Ein Treffen, bei dem du dabei warst, ist nicht mehr verfügbar.";
   }
 }
 
@@ -61,6 +68,7 @@ function destinationFor(item: SocialNotification): NotificationDestination {
     ...(item.voyage_id ? { voyageId: item.voyage_id } : {}),
     ...(item.post_id ? { postId: item.post_id } : {}),
     ...(item.reply_id ? { replyId: item.reply_id } : {}),
+    ...(item.meetup_id && item.kind !== "meetup_removed" ? { meetupId: item.meetup_id } : {}),
   };
 }
 
@@ -69,6 +77,7 @@ function KindIcon({ kind }: { kind: NotificationKind }) {
   if (kind === "friend_accepted") return <UserCheck size={18} aria-hidden="true" />;
   if (kind === "message") return <Mail size={18} aria-hidden="true" />;
   if (kind === "reaction") return <Heart size={18} aria-hidden="true" />;
+  if (kind === "meetup_changed" || kind === "meetup_canceled" || kind === "meetup_removed") return <CalendarDays size={18} aria-hidden="true" />;
   return <MessageCircle size={18} aria-hidden="true" />;
 }
 

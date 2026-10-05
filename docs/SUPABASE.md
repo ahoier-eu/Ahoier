@@ -17,7 +17,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_YOUR_KEY
 
 ## 2. Ustvari shemo
 
-V **SQL Editorju** z lastniško vlogo projekta zaženi migracije **v tem vrstnem redu**, vsako samo enkrat: osnovno shemo [`20261001000000_ahoier_shared_community.sql`](../supabase/migrations/20261001000000_ahoier_shared_community.sql), odprte plovbe [`20261002000000_ahoier_open_voyages.sql`](../supabase/migrations/20261002000000_ahoier_open_voyages.sql) in družabno steno [`20261003000000_ahoier_social_wall.sql`](../supabase/migrations/20261003000000_ahoier_social_wall.sql). Če sta prvi dve že nameščeni, izvedi samo tretjo. V projektu naj bo prek Data API izpostavljena samo predvidena javna shema; **`ahoier_private` nikoli ne dodaj med Exposed schemas**. Tretjo migracijo in zasebno shrambo izvedi pred objavo novega `/community` odjemalca.
+V **SQL Editorju** z lastniško vlogo projekta zaženi migracije **v tem vrstnem redu**: osnovno shemo [`20261001000000_ahoier_shared_community.sql`](../supabase/migrations/20261001000000_ahoier_shared_community.sql), odprte plovbe [`20261002000000_ahoier_open_voyages.sql`](../supabase/migrations/20261002000000_ahoier_open_voyages.sql), družabno steno [`20261003000000_ahoier_social_wall.sql`](../supabase/migrations/20261003000000_ahoier_social_wall.sql), profile in obvestila [`20261005000000_ahoier_profile_notifications.sql`](../supabase/migrations/20261005000000_ahoier_profile_notifications.sql) ter srečanja [`20261006000000_ahoier_meetups.sql`](../supabase/migrations/20261006000000_ahoier_meetups.sql). Če so prve štiri že nameščene, izvedi samo peto. V projektu naj bo prek Data API izpostavljena samo predvidena javna shema; **`ahoier_private` nikoli ne dodaj med Exposed schemas**. Zasebno shrambo in družabno migracijo izvedi pred objavo odjemalca `/community`; srečanja se pokažejo po peti migraciji.
 
 Tretja migracija ohrani obstoječe objave in doda fotografije, odzive, Stories, prijateljstva, zasebna sporočila, blokiranje ter moderatorsko vrsto. Obstoječi uporabniki ob naslednjem obisku sami potrdijo polnoletnost; njihovi podatki ostanejo. Imenik pokaže prikazno ime in neobvezno fotografijo vseh članov izbrane plovbe. Ker se ji lahko pridruži vsak prijavljen odrasel uporabnik, to ni seznam potrjenih potnikov. E-poštni naslov se v imeniku ne prikazuje. Zasebni pogovor je mogoč šele po obojestranski potrditvi prijateljstva.
 
@@ -224,3 +224,20 @@ select to_regclass('public.ahoier_notifications') is not null as notifications_r
 ```
 
 Vse tri vrednosti morajo biti `true`. Obvestila nastajajo šele ob novih dejanskih prošnjah za prijateljstvo, odgovorih, odzivih in sporočilih; stare aktivnosti se ne pretvorijo v navidezna obvestila. Starejše objave in profilni arhiv se nalagajo po potrebi s trenutnimi pravili RLS. Pred objavo preveri z dvema prijavljenima odraslima računoma in ločenima plovbama, da obvestilo odpre samo dovoljeno vsebino ter da profil in stena pravilno naložita naslednjo stran.
+
+## 9. Srečanja v pravi skupnosti
+
+Po uspešni četrti migraciji v **Supabase SQL Editorju kot lastnik projekta** izvedi celotno peto migracijo [`20261006000000_ahoier_meetups.sql`](../supabase/migrations/20261006000000_ahoier_meetups.sql). Datoteka ne doda vzorčnih oseb ali srečanj in jo je mogoče ponoviti. Obstoječih objav, profilov in sporočil ne prenese ali izbriše. Če je bila aplikacija objavljena pred to migracijo, stena pokaže umirjeno obvestilo, da bodo srečanja kmalu na voljo; po izvedbi osveži `/community`.
+
+Preveri namestitev brez ustvarjanja testne vsebine:
+
+```sql
+select to_regclass('public.ahoier_meetups') is not null as meetups_ready,
+       to_regclass('public.ahoier_meetup_rsvps') is not null as rsvps_ready,
+       to_regprocedure('public.ahoier_meetup_summary(uuid)') is not null as summary_ready,
+       to_regprocedure('public.ahoier_create_meetup(uuid,text,text,text,timestamp with time zone,text,integer)') is not null as create_ready;
+```
+
+Vse štiri vrednosti morajo biti `true`. Nato z **dvema resničnima testnima odraslima računoma** na isti plovbi ustvari srečanje na javnem mestu, preveri prijavo, zasedenost, odjavo, spremembo ure in odpoved ter obvestilo v drugem računu. Z računom druge plovbe preveri, da srečanje ni vidno. Preveri tudi prijavo srečanja v `/community/moderation` in skrivanje vsebine. Migracija omeji srečanja na 2–30 mest, največ 10 novih srečanj na račun v 24 urah in največ 100 aktivnih prihodnjih srečanj na plovbo. Organizator zasede eno mesto; vsak drugi račun lahko zasede eno mesto. Blokada in omejitev računa sprostita ustrezne prijave.
+
+Časovni pas in ura srečanja sta **vnos organizatorja**, ne uradni ladijski čas. Gostje naj uro preverijo na krovu. Imenik in srečanja so dostopni prijavljenim odraslim članom izbrane plovbe, vendar lahko članstvo izbere vsak tak uporabnik in **ne dokazuje rezervacije**. Dogovarjajte se za javna mesta; kabinskih številk ne objavljajte. `/pilot` ostaja samostojen lokalni preizkus in se ne sinhronizira s srečanji v `/community`.
