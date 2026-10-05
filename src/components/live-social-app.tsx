@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { User } from "@supabase/supabase-js";
 import { ArrowRight, Compass, Mail, Ship, Waves } from "lucide-react";
 import { dateLabel } from "@/lib/journey";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { LiveSocialWorkspace, type SocialProfile, type SocialVoyage } from "./live-social-workspace";
+import { LiveSocialNotifications, type NotificationDestination } from "./live-social-notifications";
 import "./live-social.css";
 import "./live-social-concept.css";
 
@@ -28,7 +29,9 @@ export function LiveSocialApp() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [notificationTarget, setNotificationTarget] = useState<(NotificationDestination & { nonce: string }) | null>(null);
   const lastUserId = useRef<string | undefined>(undefined);
+  const notificationNonce = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -38,6 +41,7 @@ export function LiveSocialApp() {
       if (lastUserId.current !== next?.id) {
         lastUserId.current = next?.id;
         setProfile(null); setVoyages([]); setJoinedIds([]); setVoyageId(""); setLoadedUserId("");
+        setNotificationTarget(null);
         setError(""); setNotice("");
       }
       setUser(next); setAuthReady(true);
@@ -138,9 +142,15 @@ export function LiveSocialApp() {
   const unjoinedVoyages = voyages.filter(v => !joinedIds.includes(v.id));
   const selectedVoyage = joinedVoyages.find(v => v.id === voyageId);
 
+  const navigateFromNotification = useCallback((destination: NotificationDestination) => {
+    if (destination.voyageId && joinedIds.includes(destination.voyageId)) setVoyageId(destination.voyageId);
+    setNotificationTarget({ ...destination, nonce: String(++notificationNonce.current) });
+  }, [joinedIds]);
+  const clearNotificationTarget = useCallback(() => setNotificationTarget(null), []);
+
   return <div className="social-live-app">
     <a className="skip-link" href="#social-main">Zum Inhalt</a>
-    <header className="social-live-header"><Link href="/" className="brand" aria-label="Ahoier Startseite">ahoier<span className="brand-dot">.</span><Waves size={23} /></Link><nav aria-label="Hauptnavigation"><Link href="/reise"><Compass size={17} /> Reise</Link>{user && <button type="button" disabled={busy} onClick={() => void client.auth.signOut()}>Abmelden</button>}</nav></header>
+    <header className="social-live-header"><Link href="/" className="brand" aria-label="Ahoier Startseite">ahoier<span className="brand-dot">.</span><Waves size={23} /></Link><nav aria-label="Hauptnavigation"><Link href="/reise"><Compass size={17} /> Reise</Link>{user && loadedUserId === user.id && profile?.adult_confirmed_at && !profile.suspended_at && selectedVoyage && <LiveSocialNotifications client={client} userId={user.id} onNavigate={navigateFromNotification} refreshKey={version} />}{user && <button type="button" disabled={busy} onClick={() => void client.auth.signOut()}>Abmelden</button>}</nav></header>
     <main id="social-main" className="social-live-main">
       {!authReady ? <div className="social-panel social-center" role="status">Anmeldung wird geprüft …</div>
         : !user ? <section className="social-entry"><div><span className="social-eyebrow"><Ship size={16} /> DEINE COMMUNITY AN BORD</span><h1>Deine Reise. <em>Deine Leute.</em></h1><p>Teile Momente, stell Fragen und lerne Menschen auf deiner Reise kennen.</p><Link href="/demo" className="social-demo-link">Demo ansehen <ArrowRight size={16} /></Link></div><form className="social-panel social-entry-form" onSubmit={sendLink}><Mail size={28} /><h2>Willkommen an Bord</h2><p>Ein Anmeldelink kommt per E-Mail.</p><label htmlFor="social-email">E-Mail-Adresse</label><input id="social-email" type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" maxLength={254} required placeholder="du@beispiel.de" /><button type="submit" disabled={busy} className="social-primary">Link senden <ArrowRight size={16} /></button><small>Der Link erstellt bei Bedarf ein Konto. Die Community ist für Erwachsene ab 18 Jahren.</small></form></section>
@@ -148,7 +158,7 @@ export function LiveSocialApp() {
         : profile?.suspended_at ? <div className="social-panel social-center" role="alert"><h1>Dein Zugang ist eingeschränkt</h1><p>Du kannst die Community zurzeit nicht nutzen.</p></div>
         : !profile || !profile.adult_confirmed_at ? <section className="social-panel social-onboarding"><span className="social-eyebrow">DEIN PROFIL</span><h1>Wie sollen dich andere nennen?</h1><p>Dein Name erscheint in der Reisegruppe. Deine E-Mail-Adresse bleibt privat.</p><form onSubmit={saveProfile}><label htmlFor="social-name">Anzeigename</label><input id="social-name" name="displayName" defaultValue={profile?.display_name ?? ""} minLength={2} maxLength={40} autoComplete="nickname" required /><label className="social-checkbox"><input type="checkbox" name="adult" required /> Ich bin mindestens 18 Jahre alt.</label><button type="submit" className="social-primary" disabled={busy}>Weiter <ArrowRight size={16} /></button></form><small>Diese Bestätigung ist eine eigene Erklärung und keine Altersprüfung.</small></section>
         : !selectedVoyage ? <section className="social-panel social-onboarding"><span className="social-eyebrow">DEINE REISE</span><h1>{voyages.length ? "Wähle deine Reise" : "Noch keine Reise verfügbar"}</h1><p>Eine Reisegruppe ist für angemeldete Erwachsene offen. Die Auswahl bestätigt keine Buchung oder Anwesenheit an Bord.</p>{voyages.length > 0 && <form onSubmit={joinVoyage}><label htmlFor="social-voyage">Schiff und Zeitraum</label><select id="social-voyage" name="voyageId" required defaultValue=""><option value="" disabled>Reise auswählen</option>{unjoinedVoyages.map(v => <option key={v.id} value={v.id}>{voyageLabel(v)}</option>)}</select><button className="social-primary" disabled={busy} type="submit">Reisegruppe öffnen <ArrowRight size={16} /></button></form>}</section>
-        : <LiveSocialWorkspace key={`${user.id}:${voyageId}`} client={client} userId={user.id} profile={profile} voyage={selectedVoyage} voyages={joinedVoyages} onVoyageChange={setVoyageId} unjoinedVoyages={unjoinedVoyages} onJoinVoyage={joinVoyage} onProfileChanged={() => setVersion(n => n + 1)} />}
+        : <LiveSocialWorkspace key={`${user.id}:${voyageId}`} client={client} userId={user.id} profile={profile} voyage={selectedVoyage} voyages={joinedVoyages} onVoyageChange={setVoyageId} unjoinedVoyages={unjoinedVoyages} onJoinVoyage={joinVoyage} onProfileChanged={() => setVersion(n => n + 1)} navigation={notificationTarget} onNavigationHandled={clearNotificationTarget} />}
       {(error || notice) && <div className={`social-toast ${error ? "is-error" : ""}`} role={error ? "alert" : "status"}>{error || notice}<button type="button" onClick={() => { setError(""); setNotice(""); }} aria-label="Hinweis schließen">×</button></div>}
     </main>
     <footer className="social-live-footer">Ahoier ist unabhängig und kein AIDA-Dienst. Die Reiseauswahl bestätigt weder Buchung noch Identität.</footer>

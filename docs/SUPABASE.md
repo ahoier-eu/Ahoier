@@ -168,7 +168,7 @@ Pri SQL Editorju pazljivo nastavi **oba**: vlogo in JWT `sub`. Brez `set local r
 3. Ko poznaš končno HTTPS domeno, v **Supabase → Authentication → URL Configuration** nastavi `Site URL` na njen izvor, na primer `https://ahoier.example`, in med **Redirect URLs** dodaj točen naslov `https://ahoier.example/community`. Če pozneje uporabiš lastno domeno, dodaj tudi njen `/community` in posodobi `Site URL`. Lokalna naslova iz razdelka 1 lahko ostaneta dovoljena. Ahoier prijavni e-poštni povezavi sam poda izvor strani in pot `/community`; `/auth/callback` ni potreben.
 4. Predogledne Vercel objave dobijo drugačne naslove. Če v njih preverjaš prijavo, omogoči spremenljivki tudi za **Preview** ter v Supabase dovoli njihove točne naslove `/community` ali [ustrezen vzorec za Vercel](https://supabase.com/docs/guides/auth/redirect-urls#vercel-preview-urls). Predogled, ki kaže na isti Supabase projekt, uporablja tudi iste resnične uporabnike in objave; za izoliran preizkus uporabi ločen Supabase projekt.
 
-Pred javno uporabo preveri vse tri migracije, vsaj eno plovbo, moderatorski račun in čiščenje medijev. E-poštna povezava se mora vrniti na **dejansko produkcijsko domeno**. Z dvema resničnima testnima računoma preveri imenik, prošnjo za prijateljstvo, zasebno sporočilo, blokado in prijavo vsebine. `/demo` je še vedno lokalen predogled v brskalniku, `/dates` pa ločen lokalni prototip. **`/pilot` je na Vercelu izklopljen**: uporablja lokalno datoteko SQLite, [Vercelove funkcije pa nimajo trajnega skupnega datotečnega sistema](https://vercel.com/kb/guide/is-sqlite-supported-in-vercel).
+Pred javno uporabo preveri vse migracije iz tega dokumenta, vsaj eno plovbo, moderatorski račun in čiščenje medijev. E-poštna povezava se mora vrniti na **dejansko produkcijsko domeno**. Z dvema resničnima testnima računoma preveri imenik, prošnjo za prijateljstvo, zasebno sporočilo, blokado in prijavo vsebine. `/demo` je še vedno lokalen predogled v brskalniku, `/dates` pa ločen lokalni prototip. **`/pilot` je na Vercelu izklopljen**: uporablja lokalno datoteko SQLite, [Vercelove funkcije pa nimajo trajnega skupnega datotečnega sistema](https://vercel.com/kb/guide/is-sqlite-supported-in-vercel).
 
 Uradna referenca: [Supabase RLS in dovoljenja](https://supabase.com/docs/guides/database/postgres/row-level-security), [Auth redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls), [upravljanje ključev](https://supabase.com/docs/guides/getting-started/api-keys).
 
@@ -206,3 +206,21 @@ Zasebni bucket ni zagotovilo, da član ne more shraniti fotografije, ki jo vidi.
 5. Sproži testni klic v cron-job.org in preveri **HTTP 200** ter odgovor `{"removed":0,"failed":0}` (ali večje število odstranjenih datotek). Če je odgovor **401**, je žeton napačen ali koda še ni posodobljena; **503** pomeni, da skrivnost v funkciji manjka ali da brisanje ni uspelo. V Supabase lahko isto izvedbo preveriš pod **Edge Functions → ahoier-media-cleanup → Invocations**. Čiščenje briše največ 100 datotek na zagon v manjših Storage paketih, kar zmanjša tveganje prekoračitve časovne omejitve zunanjega urnika.
 
 Uporabljaj samo **en aktivni urnik**. Če si že ustvaril isto opravilo v Supabase Cron, ga po uspešnem preizkusu cron-job.org odstrani v SQL Editorju: najprej preveri `select jobname, active from cron.job where jobname = 'ahoier-media-cleanup';`, in samo če poizvedba vrne vrstico, izvedi `select cron.unschedule('ahoier-media-cleanup');`. To je uporabno tudi, ko zaslon Jobs ne deluje. Ne izklapljaj celotne razširitve `pg_cron`, saj to izbriše vsa njena opravila.
+
+## 8. Profili, obvestila in starejše objave
+
+Za kratek opis, interese in obvestila po že izvedenih prvih treh migracijah v **Supabase SQL Editorju kot lastnik projekta** izvedi celotno četrto migracijo [`20261005000000_ahoier_profile_notifications.sql`](../supabase/migrations/20261005000000_ahoier_profile_notifications.sql). Datoteko lahko varno izvedeš ponovno. Ne ustvarja vzorčnih oseb, objav ali obvestil in ne zahteva novih ključev ali opravila Cron. Predhodni podatki ostanejo.
+
+Preveri, da je migracija uspešna:
+
+```sql
+select to_regclass('public.ahoier_notifications') is not null as notifications_ready,
+       exists (select 1 from information_schema.columns
+               where table_schema = 'public' and table_name = 'ahoier_profiles'
+                 and column_name = 'bio') as bio_ready,
+       exists (select 1 from information_schema.columns
+               where table_schema = 'public' and table_name = 'ahoier_profiles'
+                 and column_name = 'interests') as interests_ready;
+```
+
+Vse tri vrednosti morajo biti `true`. Obvestila nastajajo šele ob novih dejanskih prošnjah za prijateljstvo, odgovorih, odzivih in sporočilih; stare aktivnosti se ne pretvorijo v navidezna obvestila. Starejše objave in profilni arhiv se nalagajo po potrebi s trenutnimi pravili RLS. Pred objavo preveri z dvema prijavljenima odraslima računoma in ločenima plovbama, da obvestilo odpre samo dovoljeno vsebino ter da profil in stena pravilno naložita naslednjo stran.
