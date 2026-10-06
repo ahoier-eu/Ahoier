@@ -29,6 +29,8 @@ Ko nastaviš `NEXT_PUBLIC_SUPABASE_URL` in `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
 Mobilna zasnova `/community` in `/demo` sledi [odobrenemu mockupu](docs/mockups/ahoier-social/README.md): kratka naslovnica izbrane plovbe, srečanja in Stories na steni, strnjen vnos objave ter profil gosta s fotografijo, prijateljskim dejanjem in dejansko vsebino. Pravi profil hrani neobvezen kratek opis in do pet izbranih interesov; imenik jih uporablja za odkrivanje skupnih zanimanj.
 
+Na pravi steni `/community` je pod skrajšano naslovnico kartica **»Dein nächstes Ahoi«**. Iz dejanskih podatkov izbere prijavljeno srečanje v naslednjih 48 urah, sicer najbližje srečanje s prostim mestom, sicer vprašanje iz skupnosti; če nič od tega ni vidno, povabi k prvemu vprašanju. Predlogi za vprašanja in srečanja odprejo samo osnutek. Seznam srečanj ima pogled **»Meine Zusagen«**, imenik pa pokaže največ dva prostovoljno navedena skupna interesa. Če migracija srečanj še ni nameščena, stena uporablja vprašanje oziroma pošteno prazno stanje. Ne prikazuje izmišljenih potnikov, rezervacij ali odzivov kot resničnih.
+
 Navodila za nastavitev projekta, varnostnih pravil, plovb, moderatorja, čiščenja fotografij in [objavo na Vercelu](docs/SUPABASE.md#6-objava-na-vercelu) so v [docs/SUPABASE.md](docs/SUPABASE.md). V `.env.local` sodita samo **Project URL** in **publishable key**; skrivnega ključa ne dodajaj v aplikacijo ali Git. Kode v ločenem pilotu `/pilot` ostanejo del njegovega lastnega sistema.
 
 ## Povabljeni pilot

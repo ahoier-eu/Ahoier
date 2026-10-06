@@ -1276,3 +1276,160 @@
     transition-duration: .01ms !important;
   }
 }
+
+/* The live wall now starts with one real, time-sensitive invitation. */
+.social-live-app .social-voyage-cover {
+  min-height: 168px;
+}
+
+.social-live-app .social-wall-main > :first-child {
+  margin-bottom: 13px;
+}
+
+.social-live-app .social-question-prompts {
+  display: grid;
+  gap: 8px;
+  margin: -3px 0 13px;
+  padding: 11px 13px;
+  border: 1px solid #deebe2;
+  border-radius: 15px;
+  background: #f8fbf8;
+}
+
+.social-live-app .social-question-prompts > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.social-live-app .social-question-prompts small {
+  color: #617c71;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.social-live-app .social-question-prompt-buttons {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.social-live-app .social-question-prompt-buttons button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid #cce3d8;
+  border-radius: 999px;
+  background: #fff;
+  color: #1a6e62;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.social-live-app .social-question-prompt-buttons button:hover {
+  background: #e9f5ec;
+}
+
+.social-live-app .social-question-prompt-buttons button:focus-visible,
+.social-live-app .social-person-open:focus-visible {
+  outline: 3px solid #e99862;
+  outline-offset: 2px;
+}
+
+.social-live-app .social-person-interests {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.social-live-app .social-person-interests > span {
+  display: inline-block;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #e8f4ec;
+  color: #23685b;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.social-live-app .social-category[data-category="Frage"] {
+  background: #fae9da;
+  color: #9b5639;
+}
+
+.social-live-app .social-category[data-category="Tipp"] {
+  background: #e6f2f3;
+  color: #246b78;
+}
+
+.social-live-app .social-category[data-category="Zusammen an Land"] {
+  background: #eceafa;
+  color: #5a5c8e;
+}
+
+.social-live-app .social-category[data-category="Fundstück"] {
+  background: #f8efd8;
+  color: #816221;
+}
+
+.social-live-app .social-feed-empty {
+  border: 1px dashed #bdd7c7;
+  background: linear-gradient(150deg, #fff 0%, #f2f9f3 100%);
+}
+
+@media (max-width: 650px) {
+  .social-live-app .social-voyage-cover {
+    min-height: 108px;
+    border-radius: 16px;
+  }
+
+  .social-live-app .social-voyage-cover-content {
+    padding: 8px 13px 25px;
+  }
+
+  .social-live-app .social-voyage-cover .social-cover-kicker {
+    min-height: 19px;
+    padding: 4px 7px;
+    font-size: 9px;
+  }
+
+  .social-live-app .social-voyage-cover h1 {
+    font-size: 25px;
+  }
+
+  .social-live-app .social-voyage-cover p {
+    display: none;
+  }
+
+  .social-live-app .social-voyage-cover-content > small {
+    max-width: 54%;
+    font-size: 10px;
+  }
+
+  .social-live-app .social-voyage-cover > .social-voyage-cover-credit {
+    max-width: 45%;
+    font-size: 9px;
+  }
+
+  .social-live-app .social-question-prompts {
+    margin-top: -2px;
+    padding: 9px 10px;
+  }
+
+  .social-live-app .social-question-prompts > div:first-child {
+    display: grid;
+    gap: 2px;
+  }
+}
+
+@media (max-width: 650px) and (max-height: 650px) {
+  .social-live-app .social-voyage-cover { min-height: 88px; }
+  .social-live-app .social-voyage-cover-content { padding-bottom: 19px; }
+}

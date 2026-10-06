@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { CalendarDays, Check, Clock3, Flag, MapPin, Plus, RefreshCw, Users, X } from "lucide-react";
+import { CalendarDays, Check, Clock3, Coffee, Compass, Dice5, Flag, MapPin, Plus, RefreshCw, Users, UtensilsCrossed, X } from "lucide-react";
 import { instantForLocalTime, localTimeForInstant } from "@/lib/meetup-time";
 import styles from "./live-social-meetups.module.css";
 
@@ -47,6 +47,7 @@ type Props = {
   onLoadAttendees: (id: string) => Promise<MeetupAttendee[]>;
   onReport: (id: string, reason: MeetupReportReason, details: string) => Promise<void>;
   focusMeetupId?: string;
+  createRequest?: number;
   onRefresh?: () => void;
 };
 
@@ -54,6 +55,23 @@ const SUGGESTED_ZONES = [
   "Europe/Berlin", "Europe/London", "Europe/Lisbon", "Europe/Athens",
   "Atlantic/Canary", "Atlantic/Azores", "America/New_York", "America/Los_Angeles", "UTC",
 ];
+
+const MEETUP_IDEAS = [
+  { label: "Kaffee", Icon: Coffee, title: "Wer kommt auf einen Kaffee mit?", description: "Ein Kaffee, ein bisschen Meer und neue Bekanntschaften. Auch allein bist du willkommen!" },
+  { label: "Spiele", Icon: Dice5, title: "Wer hat Lust auf eine Runde Spiele?", description: "Eine entspannte Spielrunde für neue und bekannte Gesichter. Was wir spielen, entscheiden wir zusammen." },
+  { label: "Hafenspaziergang", Icon: Compass, title: "Zusammen den nächsten Hafen entdecken", description: "Wer möchte gemeinsam auf Entdeckungstour gehen? Route, Treffpunkt und Rückkehr stimmen wir vorab ab." },
+  { label: "Abendessen", Icon: UtensilsCrossed, title: "Gesellschaft fürs Abendessen gesucht", description: "Lass uns gemeinsam essen und kennenlernen. Restaurant und Treffpunkt stimmen wir in der Gruppe ab." },
+] as const;
+
+function meetupStateLabel(meetup: SocialMeetup, now: number, userId: string): string {
+  if (meetup.canceled_at) return "Abgesagt";
+  if (new Date(meetup.starts_at).getTime() < now) return "Vergangen";
+  if (meetup.joined_by_me) return "Ich bin dabei";
+  if (meetup.organizer_id === userId) return "Dein Treffen";
+  const places = Math.max(0, meetup.capacity - meetup.attendee_count);
+  if (places === 0) return "Ausgebucht";
+  return `${places} ${places === 1 ? "Platz frei" : "Plätze frei"}`;
+}
 
 function deviceTimeZone(): string {
   try { return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; }
@@ -101,12 +119,16 @@ function ReportDialog({ meetup, busy, error, onClose, onSubmit }: {
   </dialog>;
 }
 
-export function LiveSocialMeetups({ meetups, status, userId, voyageStartDate, voyageEndDate, onCreate, onUpdate, onJoin, onLeave, onCancel, onLoadAttendees, onReport, focusMeetupId, onRefresh }: Props) {
+export function LiveSocialMeetups({ meetups, status, userId, voyageStartDate, voyageEndDate, onCreate, onUpdate, onJoin, onLeave, onCancel, onLoadAttendees, onReport, focusMeetupId, createRequest, onRefresh }: Props) {
   const formId = useId();
   const titleRef = useRef<HTMLInputElement>(null);
+  const lastCreateRequest = useRef(createRequest);
   const [formOpen, setFormOpen] = useState(false);
   const [editingMeetupId, setEditingMeetupId] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [onlyMine, setOnlyMine] = useState(false);
+  const [joinedPulseId, setJoinedPulseId] = useState("");
+  const pulseTimer = useRef<number | null>(null);
   const [now, setNow] = useState(Date.now);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -129,21 +151,46 @@ export function LiveSocialMeetups({ meetups, status, userId, voyageStartDate, vo
     const timer = window.setInterval(() => setNow(Date.now()), 60_000);
     return () => window.clearInterval(timer);
   }, []);
-  useEffect(() => { if (focusMeetupId) queueMicrotask(() => setShowAll(true)); }, [focusMeetupId]);
+  useEffect(() => () => { if (pulseTimer.current !== null) window.clearTimeout(pulseTimer.current); }, []);
+  useEffect(() => { if (focusMeetupId) queueMicrotask(() => { setOnlyMine(false); setShowAll(true); }); }, [focusMeetupId]);
+  useEffect(() => {
+    if (createRequest === undefined || createRequest === lastCreateRequest.current) return;
+    lastCreateRequest.current = createRequest;
+    queueMicrotask(() => {
+      if (!formOpen || editingMeetupId) {
+        setEditingMeetupId("");
+        setTitle(""); setDescription(""); setLocation(""); setLocalTime(""); setCapacity(8);
+        setTimeZone(deviceTimeZone());
+        setError("");
+      }
+      setFormOpen(true);
+      window.requestAnimationFrame(() => document.getElementById(`${formId}-form`)?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }));
+    });
+  }, [createRequest, editingMeetupId, formId, formOpen]);
   useEffect(() => { if (formOpen) titleRef.current?.focus(); }, [formOpen, editingMeetupId]);
 
   const ordered = [...meetups].sort((a, b) => {
     const rank = (item: SocialMeetup) => new Date(item.starts_at).getTime() < now ? 2 : item.canceled_at ? 1 : 0;
     return rank(a) - rank(b) || a.starts_at.localeCompare(b.starts_at);
   });
+  const currentPledges = ordered.filter(item => item.joined_by_me && !item.canceled_at && new Date(item.starts_at).getTime() >= now);
+  const myCount = currentPledges.length;
+  const filtered = onlyMine ? currentPledges : ordered;
   const expanded = showAll || Boolean(focusMeetupId);
-  const visible = expanded ? ordered : ordered.slice(0, 3);
+  const visible = expanded ? filtered : filtered.slice(0, 3);
   const editingMeetup = ordered.find(item => item.id === editingMeetupId);
 
-  function openCreate() {
-    if (formOpen && !editingMeetupId) { setFormOpen(false); return; }
+  function openCreate(idea?: (typeof MEETUP_IDEAS)[number]) {
+    if (formOpen && !editingMeetupId && !idea) { setFormOpen(false); return; }
+    if (formOpen && !editingMeetupId && idea) {
+      setTitle(current => current.trim() ? current : idea.title);
+      setDescription(current => current.trim() ? current : idea.description);
+      setError("");
+      titleRef.current?.focus();
+      return;
+    }
     setEditingMeetupId("");
-    setTitle(""); setDescription(""); setLocation(""); setLocalTime(""); setCapacity(8);
+    setTitle(idea?.title ?? ""); setDescription(idea?.description ?? ""); setLocation(""); setLocalTime(""); setCapacity(8);
     setTimeZone(deviceTimeZone());
     setError("");
     setFormOpen(true);
@@ -159,7 +206,7 @@ export function LiveSocialMeetups({ meetups, status, userId, voyageStartDate, vo
     setCapacity(meetup.capacity);
     setError("");
     setFormOpen(true);
-    window.requestAnimationFrame(() => document.getElementById(`${formId}-form`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    window.requestAnimationFrame(() => document.getElementById(`${formId}-form`)?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }));
   }
 
   function closeForm() { setFormOpen(false); setEditingMeetupId(""); setError(""); }
@@ -177,6 +224,14 @@ export function LiveSocialMeetups({ meetups, status, userId, voyageStartDate, vo
         const id = action.slice(action.indexOf(":") + 1);
         setAttendees(current => { const next = { ...current }; delete next[id]; return next; });
         setOpenAttendeesId("");
+        if (action.startsWith("join:")) {
+          if (pulseTimer.current !== null) window.clearTimeout(pulseTimer.current);
+          setJoinedPulseId(id);
+          pulseTimer.current = window.setTimeout(() => {
+            setJoinedPulseId(current => current === id ? "" : current);
+            pulseTimer.current = null;
+          }, 1400);
+        }
       }
     } catch {
       setError("Das hat nicht geklappt. Bitte versuche es erneut.");
@@ -240,7 +295,7 @@ export function LiveSocialMeetups({ meetups, status, userId, voyageStartDate, vo
   return <section className={styles.section} aria-labelledby={`${formId}-title`}>
     <div className={styles.sectionHead}>
       <div><span className={styles.eyebrow}>GEMEINSAM ERLEBEN</span><h2 id={`${formId}-title`}>Heute & kommende Treffen</h2></div>
-      {status === "ready" && <button type="button" className={styles.newButton} onClick={openCreate} aria-expanded={formOpen && !editingMeetupId} aria-controls={`${formId}-form`}><Plus size={17} aria-hidden="true" /> Treffen vorschlagen</button>}
+      {status === "ready" && <button type="button" className={styles.newButton} onClick={() => openCreate()} aria-expanded={formOpen && !editingMeetupId} aria-controls={`${formId}-form`}><Plus size={17} aria-hidden="true" /> Treffen vorschlagen</button>}
     </div>
 
     {status === "unavailable" ? <p className={styles.quiet} role="status">Treffen sind für diese Reise bald verfügbar.</p>
@@ -248,6 +303,7 @@ export function LiveSocialMeetups({ meetups, status, userId, voyageStartDate, vo
         : status === "error" ? <div className={styles.quiet} role="status">Treffen konnten nicht geladen werden. {onRefresh && <button type="button" onClick={onRefresh}><RefreshCw size={14} /> Erneut versuchen</button>}</div>
           : <>
             <div aria-live="polite" className={styles.messages}>{error && <p className={styles.error}>{error}</p>}{notice && <p className={styles.notice}>{notice}</p>}</div>
+            {!editingMeetupId && <div className={styles.ideaBar} aria-label="Ideen für ein Treffen"><span>Eine Idee zum Start:</span><div className={styles.ideaButtons}>{MEETUP_IDEAS.map(idea => <button key={idea.label} type="button" onClick={() => openCreate(idea)} aria-controls={`${formId}-form`}><idea.Icon size={15} aria-hidden="true" />{idea.label}</button>)}</div><small>Öffnet nur einen Entwurf.</small></div>}
             {formOpen && <form id={`${formId}-form`} className={styles.form} onSubmit={event => void create(event)}>
               <div className={styles.formTitle}><div><h3>{editingMeetupId ? "Treffen bearbeiten" : "Ein Treffen planen"}</h3><p>Eine konkrete Idee macht es anderen leicht, dazuzukommen.</p></div><button type="button" onClick={closeForm} aria-label="Formular schließen"><X size={19} /></button></div>
               <div className={styles.formGrid}>
@@ -262,16 +318,19 @@ export function LiveSocialMeetups({ meetups, status, userId, voyageStartDate, vo
               <div className={styles.formActions}><button type="button" className={styles.secondary} onClick={closeForm}>Abbrechen</button><button type="submit" className={styles.primary} disabled={Boolean(busyAction)}>{busyAction ? "Wird gespeichert …" : editingMeetupId ? "Änderungen speichern" : "Treffen veröffentlichen"}</button></div>
             </form>}
 
-            {ordered.length === 0 ? <div className={styles.empty}><CalendarDays size={22} aria-hidden="true" /><p>Noch keine Treffen geplant. Starte mit einer einfachen Einladung.</p></div>
-              : <><div className={`${styles.cards} ${expanded ? styles.allCards : ""}`} role="list" aria-label="Kommende Treffen">
+            {ordered.length > 0 && <div className={styles.filters} role="group" aria-label="Treffen anzeigen"><button type="button" className={!onlyMine ? styles.selectedFilter : ""} aria-pressed={!onlyMine} onClick={() => { setOnlyMine(false); setShowAll(false); }}>Alle Treffen</button><button type="button" className={onlyMine ? styles.selectedFilter : ""} aria-pressed={onlyMine} onClick={() => { setOnlyMine(true); setShowAll(false); }}>Meine Zusagen ({myCount})</button></div>}
+            {ordered.length === 0 ? <div className={styles.empty}><CalendarDays size={22} aria-hidden="true" /><p>Noch keine Treffen geplant. Wähle eine Idee oder schlage selbst ein Treffen vor.</p></div>
+              : filtered.length === 0 ? <div className={styles.empty}><Check size={22} aria-hidden="true" /><p>Du hast noch keine Zusagen für kommende Treffen. Entdecke die Treffen deiner Reisegruppe.</p><button type="button" onClick={() => setOnlyMine(false)}>Alle Treffen ansehen</button></div>
+              : <><div className={`${styles.cards} ${expanded ? styles.allCards : ""}`} role="list" aria-label={onlyMine ? "Meine Zusagen" : "Treffen dieser Reise"}>
                 {visible.map(meetup => {
                   const own = meetup.organizer_id === userId;
                   const canceled = Boolean(meetup.canceled_at);
                   const passed = new Date(meetup.starts_at).getTime() < now;
                   const full = meetup.attendee_count >= meetup.capacity;
                   const participantLabel = `${meetup.attendee_count} von ${meetup.capacity} Plätzen belegt`;
-                  return <article key={meetup.id} id={`social-meetup-${meetup.id}`} tabIndex={-1} className={`${styles.card} ${canceled ? styles.canceled : ""}`} role="listitem">
-                    <div className={styles.cardTop}><span className={styles.dateIcon}><CalendarDays size={20} aria-hidden="true" /></span><span className={styles.cardDate}>{formatInZone(new Date(meetup.starts_at), meetup.time_zone)}</span>{canceled && <span className={styles.canceledBadge}>Abgesagt</span>}</div>
+                  return <article key={meetup.id} id={`social-meetup-${meetup.id}`} tabIndex={-1} className={`${styles.card} ${canceled ? styles.canceled : ""} ${joinedPulseId === meetup.id ? styles.joinPulse : ""}`} role="listitem">
+                    <div className={styles.cardTop}><span className={styles.kindBadge}>Treffen</span><span className={`${styles.stateBadge} ${canceled ? styles.stateCanceled : passed ? styles.statePast : meetup.joined_by_me ? styles.stateJoined : full ? styles.stateFull : ""}`}>{meetupStateLabel(meetup, now, userId)}</span></div>
+                    <p className={styles.cardDate}><CalendarDays size={15} aria-hidden="true" />{formatInZone(new Date(meetup.starts_at), meetup.time_zone)}</p>
                     <h3>{meetup.title}</h3>
                     {meetup.description && <p className={styles.description}>{meetup.description}</p>}
                     <p className={styles.meta}><MapPin size={15} aria-hidden="true" /><span>{meetup.location_label}</span></p>
@@ -294,7 +353,7 @@ export function LiveSocialMeetups({ meetups, status, userId, voyageStartDate, vo
                     </div>
                   </article>;
                 })}
-              </div>{ordered.length > 3 && <button type="button" className={styles.showAll} onClick={() => setShowAll(current => !current)} aria-expanded={expanded}>{expanded ? "Weniger Treffen anzeigen" : `Alle ${ordered.length} Treffen anzeigen`}</button>}</>}
+              </div>{filtered.length > 3 && <button type="button" className={styles.showAll} onClick={() => setShowAll(current => !current)} aria-expanded={expanded}>{expanded ? "Weniger Treffen anzeigen" : onlyMine ? `Alle ${filtered.length} Zusagen anzeigen` : `Alle ${filtered.length} Treffen anzeigen`}</button>}</>}
             <p className={styles.footerNote}>Bitte nur öffentliche Treffpunkte vereinbaren. Die Reisegruppe prüft keine Buchung oder Anwesenheit.</p>
           </>}
     {reportMeetup && <ReportDialog meetup={reportMeetup} busy={busyAction === `report:${reportMeetup.id}`} error={reportError} onClose={() => setReportMeetup(null)} onSubmit={(reason, details) => void submitReport(reason, details)} />}
